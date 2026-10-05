@@ -1,0 +1,139 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             x:Class="Deduplicator.App.Views.JournalView">
+
+    <ScrollViewer>
+        <StackPanel Margin="{StaticResource PagePadding}" Spacing="20">
+            <Border Classes="hero">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="8" MaxWidth="660" HorizontalAlignment="Left">
+                        <TextBlock Classes="eyebrow" Text="БЕЗОПАСНОСТЬ" Foreground="#E6E8FF"/>
+                        <TextBlock Classes="display" Text="{x:Static loc:Strings.JournalTitle}" Foreground="White"/>
+                        <TextBlock Classes="bodyLarge" Text="{x:Static loc:Strings.JournalHint}"
+                                   Foreground="White" Opacity="0.78" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="tonal" VerticalAlignment="Top"
+                            Command="{Binding LoadCommand}"
+                            AutomationProperties.Name="Обновить историю операций"
+                            AutomationProperties.HelpText="Заново загружает список удаления и восстановления">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource IconRefresh}"/>
+                            <TextBlock Text="{x:Static loc:Strings.Refresh}"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Border IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Classes="cardFlat" Background="{DynamicResource DangerSoft}"
+                    BorderBrush="{DynamicResource DangerBrush}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <PathIcon Data="{StaticResource IconWarning}" Foreground="{DynamicResource DangerBrush}"
+                              VerticalAlignment="Top" Margin="0,2,0,0"/>
+                    <StackPanel Spacing="3">
+                        <TextBlock Classes="sectionTitle" Text="Не удалось выполнить действие"
+                                   Foreground="{DynamicResource DangerBrush}"/>
+                        <TextBlock Text="{Binding Status}" Classes="bodyLarge" TextWrapping="Wrap"
+                                   AutomationProperties.LiveSetting="Assertive"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Grid ColumnDefinitions="*,Auto" Margin="2,0">
+                <StackPanel>
+                    <TextBlock Classes="sectionTitle" Text="Последние операции"/>
+                    <TextBlock Classes="muted" Text="Файлы из карантина можно вернуть на прежнее место одним нажатием."
+                               Margin="0,4,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+                <ProgressBar Grid.Column="1" IsIndeterminate="True" Width="96" VerticalAlignment="Center"
+                             IsVisible="{Binding IsBusy}"/>
+            </Grid>
+
+            <Border Classes="card" Padding="10" MinHeight="300">
+                <Grid RowDefinitions="*,Auto">
+                    <StackPanel Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Grid.Row="0"
+                                IsVisible="{Binding Empty, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <Border Classes="iconTile" Width="64" Height="64" CornerRadius="20"
+                                HorizontalAlignment="Center">
+                            <PathIcon Data="{StaticResource IconHistory}" Width="30" Height="30"
+                                      Foreground="{DynamicResource AccentBrush}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding Empty}" Classes="h2"
+                                   HorizontalAlignment="Center" TextAlignment="Center"
+                                   TextWrapping="Wrap" MaxWidth="440"/>
+                        <TextBlock Classes="bodyLarge muted"
+                                   Text="Когда вы удалите или переименуете файлы, операции появятся здесь — их можно будет отменить."
+                                   HorizontalAlignment="Center" TextAlignment="Center"
+                                   TextWrapping="Wrap" MaxWidth="430"/>
+                    </StackPanel>
+
+                    <ItemsControl Grid.Row="0" ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Classes="cardFlat" Margin="4,4" Padding="16">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Border Grid.Column="0" Classes="iconTile" VerticalAlignment="Top">
+                                                <PathIcon Data="{StaticResource IconHistory}" Width="21" Height="21"
+                                                          Foreground="{DynamicResource AccentBrush}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Margin="14,0,18,0" Spacing="7">
+                                                <StackPanel Orientation="Horizontal" Spacing="9">
+                                                    <TextBlock Text="{Binding FileName}" Classes="sectionTitle"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <Border Classes="badge" Background="{DynamicResource AccentSoft}"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding OpText}" Foreground="{DynamicResource AccentBrush}"/>
+                                                    </Border>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding SrcPath}" Classes="caption mono"
+                                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding SrcPath}"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="{Binding SizeText}" Classes="caption"/>
+                                                    <TextBlock Text="·" Classes="caption"/>
+                                                    <TextBlock Text="{Binding WhenText}" Classes="caption"/>
+                                                    <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource SuccessBrush}"
+                                                               FontWeight="SemiBold"
+                                                               IsVisible="{Binding StatusText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <Button Grid.Column="2" Classes="tonal"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.RestoreCommand}"
+                                                    CommandParameter="{Binding}" IsEnabled="{Binding CanRestore}"
+                                                    VerticalAlignment="Center"
+                                                    ToolTip.Tip="Попробовать вернуть файл на прежнее место"
+                                                    AutomationProperties.Name="Восстановить файл"
+                                                    AutomationProperties.HelpText="Возвращает файл из карантина на прежнее место">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <PathIcon Data="{StaticResource IconRestore}"/>
+                                                    <TextBlock Text="{x:Static loc:Strings.Restore}"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"
+                                Spacing="12" Margin="0,14,0,4">
+                        <TextBlock Text="{Binding PageStatus}" Classes="caption" VerticalAlignment="Center"/>
+                        <Button Classes="ghost" Command="{Binding LoadPreviousCommand}" IsVisible="{Binding HasPrevious}"
+                                AutomationProperties.Name="Показать более новые операции">
+                            <TextBlock Text="Назад"/>
+                        </Button>
+                        <Button Classes="tonal" Command="{Binding LoadMoreCommand}" IsVisible="{Binding HasMore}"
+                                AutomationProperties.Name="Показать более ранние операции">
+                            <TextBlock Text="Далее"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

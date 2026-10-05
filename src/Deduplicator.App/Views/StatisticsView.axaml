@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             x:Class="Deduplicator.App.Views.StatisticsView">
+
+    <ScrollViewer>
+        <StackPanel Margin="{StaticResource PagePadding}" Spacing="20" MaxWidth="1080" HorizontalAlignment="Stretch">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="5" MaxWidth="700" HorizontalAlignment="Left">
+                    <TextBlock Classes="eyebrow" Text="ВАШ РЕЗУЛЬТАТ"/>
+                    <TextBlock Classes="h1" Text="{x:Static loc:Strings.StatisticsTitle}"/>
+                    <TextBlock Classes="muted bodyLarge" Text="Понятная сводка по найденным копиям и сохранённым файлам."
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="90" IsVisible="{Binding IsBusy}"
+                                 AutomationProperties.Name="Обновляю сводку"/>
+                    <Button Classes="tonal" Command="{Binding LoadCommand}" IsEnabled="{Binding !IsBusy}"
+                            ToolTip.Tip="Пересчитать итоги" AutomationProperties.Name="Обновить итоги"
+                            AutomationProperties.HelpText="Заново вычисляет статистику по сохранённым данным">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource IconRefresh}"/>
+                            <TextBlock Text="{x:Static loc:Strings.Refresh}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <Border Classes="cardFlat" Padding="14,10" Background="{DynamicResource DangerSoft}"
+                    BorderBrush="{DynamicResource DangerBrush}"
+                    IsVisible="{Binding ErrorText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap"
+                           AutomationProperties.LiveSetting="Assertive"/>
+            </Border>
+
+            <Border Classes="hero"
+                    AutomationProperties.Name="{Binding TotalReclaimableText, StringFormat='Можно освободить {0}'}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="МОЖНО ОСВОБОДИТЬ" FontSize="13" FontWeight="SemiBold" LetterSpacing="1.2"
+                                   Foreground="#E6E8FF"/>
+                        <TextBlock Text="{Binding TotalReclaimableText}" Classes="display" FontSize="38" Foreground="White"/>
+                        <TextBlock Text="После проверки выбранных копий. Ничего не удаляется автоматически."
+                                   FontSize="14.5" Foreground="#D7DCF2" TextWrapping="Wrap" MaxWidth="520"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Width="74" Height="74" CornerRadius="22" Background="#26FFFFFF"
+                            VerticalAlignment="Center">
+                        <PathIcon Data="{StaticResource IconChart}" Width="34" Height="34" Foreground="White"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="cardFlat" Margin="0,0,7,0"
+                        AutomationProperties.Name="{Binding ExactGroupsText, StringFormat='Группы одинаковых файлов: {0}'}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="iconTile"><PathIcon Data="{StaticResource IconLayers}" Foreground="{DynamicResource AccentBrush}"/></Border>
+                        <StackPanel Grid.Column="1" Margin="14,0,0,0" Spacing="2">
+                            <TextBlock Classes="caption" Text="{x:Static loc:Strings.StatExactGroups}"/>
+                            <TextBlock FontSize="26" FontWeight="SemiBold" Text="{Binding ExactGroupsText}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border Grid.Column="1" Classes="cardFlat" Margin="7,0"
+                        AutomationProperties.Name="{Binding SimilarImagesText, StringFormat='Группы похожих изображений: {0}'}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="iconTile"><PathIcon Data="{StaticResource IconImage}" Foreground="{DynamicResource AccentBrush}"/></Border>
+                        <StackPanel Grid.Column="1" Margin="14,0,0,0" Spacing="2">
+                            <TextBlock Classes="caption" Text="{x:Static loc:Strings.StatSimilarImages}"/>
+                            <TextBlock FontSize="26" FontWeight="SemiBold" Text="{Binding SimilarImagesText}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border Grid.Column="2" Classes="cardFlat" Margin="7,0,0,0"
+                        AutomationProperties.Name="{Binding SimilarAudioText, StringFormat='Группы похожей музыки: {0}'}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="iconTile"><PathIcon Data="{StaticResource IconMusic}" Foreground="{DynamicResource AccentBrush}"/></Border>
+                        <StackPanel Grid.Column="1" Margin="14,0,0,0" Spacing="2">
+                            <TextBlock Classes="caption" Text="{x:Static loc:Strings.StatSimilarAudio}"/>
+                            <TextBlock FontSize="26" FontWeight="SemiBold" Text="{Binding SimilarAudioText}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Border Classes="card">
+                <StackPanel Spacing="18">
+                    <Grid RowDefinitions="Auto,Auto">
+                        <StackPanel Grid.Row="0" Spacing="3">
+                            <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.StatByCategory}"/>
+                            <TextBlock Classes="caption" Text="Какие файлы занимают место в сохранённом каталоге"/>
+                        </StackPanel>
+                        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,14,0,0">
+                            <Border Grid.Column="0" Classes="cardFlat" Margin="0,0,7,0" Padding="14"
+                                    AutomationProperties.Name="{Binding DuplicateFilesText, StringFormat='Файлов-дубликатов: {0}'}">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Classes="caption" Text="{x:Static loc:Strings.StatDuplicateFiles}"/>
+                                    <TextBlock Classes="h2" Text="{Binding DuplicateFilesText}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Classes="cardFlat" Margin="7,0,0,0" Padding="14"
+                                    AutomationProperties.Name="{Binding IndexedText, StringFormat='Запомнено: {0}'}">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Classes="caption" Text="{x:Static loc:Strings.StatIndexed}"/>
+                                    <TextBlock FontWeight="SemiBold" Text="{Binding IndexedText}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Categories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="120,*,Auto" Margin="0,7"
+                                      AutomationProperties.Name="{Binding Name}">
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <Grid Grid.Column="1" Margin="16,0" VerticalAlignment="Center">
+                                        <Border Height="10" CornerRadius="5" Background="{DynamicResource SurfaceAlt}"/>
+                                        <Border Height="10" CornerRadius="5" Width="{Binding BarWidth}"
+                                                HorizontalAlignment="Left" Background="{Binding Color}"/>
+                                    </Grid>
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Classes="caption">
+                                        <Run Text="{Binding BytesText}"/><Run Text="  ·  "/><Run Text="{Binding CountText}"/>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

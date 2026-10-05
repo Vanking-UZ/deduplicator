@@ -1,0 +1,127 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             x:Class="Deduplicator.App.Views.CrossDiskView">
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="{StaticResource PagePadding}">
+        <StackPanel Grid.Row="0" Spacing="5" Margin="0,0,0,14" MaxWidth="760" HorizontalAlignment="Left">
+                <TextBlock Classes="eyebrow" Text="СРАВНЕНИЕ АРХИВОВ"/>
+                <TextBlock Classes="h1" Text="{x:Static loc:Strings.CrossDiskTitle}"/>
+                <TextBlock Classes="muted bodyLarge" Text="{x:Static loc:Strings.CrossDiskSubtitle}" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Classes="cardFlat" Padding="12" Margin="0,0,0,16">
+            <Grid RowDefinitions="Auto,Auto,Auto">
+                <Grid ColumnDefinitions="*,Auto">
+                <StackPanel VerticalAlignment="Center" Margin="4,0,16,0">
+                    <TextBlock Text="Найдено между носителями" Classes="caption"/>
+                    <TextBlock Text="{Binding Summary}" FontWeight="SemiBold" Margin="0,2,0,0"/>
+                </StackPanel>
+                <ProgressBar Grid.Column="1" IsIndeterminate="True" Width="96" IsVisible="{Binding IsBusy}"
+                             VerticalAlignment="Center"
+                             AutomationProperties.Name="Обновление совпадений между дисками"/>
+                </Grid>
+                <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Classes="primary" Command="{Binding OpenScanCommand}" Margin="0,0,10,0"
+                        ToolTip.Tip="Перейти к поиску копий и проверить несколько дисков"
+                        AutomationProperties.Name="Проверить несколько дисков"
+                        AutomationProperties.HelpText="Открывает выбор носителей для нового безопасного поиска">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconSearch}"/>
+                        <TextBlock Text="Проверить диски"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="tonal iconButton" Command="{Binding LoadCommand}"
+                        ToolTip.Tip="Обновить список совпадений между дисками"
+                        AutomationProperties.Name="Обновить совпадения">
+                    <PathIcon Data="{StaticResource IconRefresh}"/>
+                </Button>
+                </WrapPanel>
+                <TextBlock Grid.Row="2" Text="{Binding Error}" Foreground="{DynamicResource DangerBrush}"
+                           Margin="4,10,4,0" TextWrapping="Wrap"
+                           IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           AutomationProperties.LiveSetting="Assertive"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Classes="card" Padding="12" MaxWidth="1080" HorizontalAlignment="Stretch"
+                AutomationProperties.Name="Совпадения файлов между дисками">
+            <Grid RowDefinitions="*,Auto">
+                <!-- Пустое состояние — иконка + текст из VM + подсказка -->
+                <StackPanel Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40"
+                            IsVisible="{Binding Empty, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <Border Width="72" Height="72" CornerRadius="22" Background="{DynamicResource AccentSoft}">
+                        <PathIcon Data="{StaticResource IconDatabase}" Width="32" Height="32"
+                                  Foreground="{DynamicResource AccentBrush}"/>
+                    </Border>
+                    <TextBlock Text="{Binding Empty}" FontSize="19" FontWeight="SemiBold"
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" MaxWidth="420"/>
+                    <TextBlock Classes="muted" Text="Проверьте несколько дисков — совпадения файлов между ними появятся здесь, даже если диски уже отключены."
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" MaxWidth="400"/>
+                </StackPanel>
+                <ListBox Grid.Row="0" ItemsSource="{Binding Groups}" Background="Transparent"
+                         BorderThickness="0"
+                         AutomationProperties.Name="Страницы совпадений между дисками">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="cardFlat" Margin="4,6" Padding="18"
+                                        AutomationProperties.Name="{Binding Title, StringFormat='Группа копий: {0}'}">
+                                    <StackPanel Spacing="8">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <PathIcon Grid.Column="0" Data="{StaticResource IconDatabase}" Width="18" Height="18"
+                                                      Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold" Margin="10,0"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Summary}" Classes="caption" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <ItemsControl ItemsSource="{Binding Files}" Margin="28,0,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnDefinitions="180,*,Auto" Margin="0,3"
+                                                          AutomationProperties.Name="{Binding RelPath, StringFormat='Файл: {0}'}">
+                                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,0,12,0">
+                                                            <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                                                                     Fill="{DynamicResource SuccessBrush}" IsVisible="{Binding VolumeConnected}"/>
+                                                            <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                                                                     Fill="{DynamicResource TextTertiary}" IsVisible="{Binding !VolumeConnected}"/>
+                                                            <TextBlock Text="{Binding VolumeName}" VerticalAlignment="Center"
+                                                                       TextTrimming="CharacterEllipsis"/>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding RelPath}" Classes="caption mono"
+                                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                                   ToolTip.Tip="{Binding RelPath}"/>
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="14,0,0,0">
+                                                            <TextBlock Text="{Binding StatusText}" Classes="caption" VerticalAlignment="Center"/>
+                                                            <TextBlock Text="{Binding SizeText}" Classes="caption" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                </ListBox>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,16,0,8">
+                        <TextBlock Text="{Binding PageStatus}" Classes="caption" VerticalAlignment="Center"/>
+                        <Button Classes="ghost" Command="{Binding LoadPreviousCommand}" IsVisible="{Binding HasPrevious}"
+                                AutomationProperties.Name="Показать предыдущую страницу совпадений">
+                            <TextBlock Text="Назад"/>
+                        </Button>
+                        <Button Classes="tonal" Command="{Binding LoadMoreCommand}" IsVisible="{Binding HasMore}"
+                                AutomationProperties.Name="Показать ещё совпадения между дисками">
+                            <TextBlock Text="Далее"/>
+                        </Button>
+                    </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

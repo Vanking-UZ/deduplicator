@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>Deduplicator.MftHelper</AssemblyName>
+    <RootNamespace>Deduplicator.MftHelper</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <!-- Намеренно нет ссылок на App, Core, SQLite, DI, настройки или UI. -->
+  <ItemGroup>
+    <ProjectReference Include="..\FastDedup.Engine\FastDedup.Engine.csproj" />
+  </ItemGroup>
+</Project>

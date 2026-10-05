@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- One version source for assemblies, publish output and the installer scripts. -->
+    <VersionPrefix>1.0.1</VersionPrefix>
+    <Version>$(VersionPrefix)</Version>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+
+    <!-- The product and its release artifact are Windows x64 only today. Keeping the RID
+         in the project graph makes the same lock files valid for build and self-contained publish. -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+
+    <!-- Restore writes deterministic lock files; CI restores them in locked mode. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Deduplicator.Core</RootNamespace>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.28" />
+    <!-- 3.x bundles SQLite >= 3.50.4 and replaces the vulnerable 2.1.6 native build
+         (GHSA-2m69-gcr7-jv3q / CVE-2025-6965). Keep this direct pin: the Microsoft
+         provider only declares a lower bound and otherwise restores the old bundle. -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
+    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageReference Include="CoenM.ImageSharp.ImageHash" Version="1.3.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Быстрый энумератор файлов (USN/MFT). Используется ТОЛЬКО как источник файлов в ScanService. -->
+    <ProjectReference Include="..\FastDedup.Engine\FastDedup.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

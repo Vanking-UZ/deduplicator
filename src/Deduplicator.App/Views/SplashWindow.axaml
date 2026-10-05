@@ -1,0 +1,63 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+        xmlns:controls="clr-namespace:Deduplicator.App.Controls"
+        x:Class="Deduplicator.App.Views.SplashWindow"
+        Title="Deduplicator"
+        Width="520" Height="360"
+        CanResize="False" ShowInTaskbar="False"
+        SystemDecorations="None" WindowStartupLocation="CenterScreen"
+        TransparencyLevelHint="Transparent" Background="Transparent"
+        Opacity="0" Icon="/Assets/app-icon-256.png"
+        AutomationProperties.Name="Запуск Deduplicator">
+
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.28" />
+                </Transitions>
+            </Setter>
+        </Style>
+    </Window.Styles>
+
+    <Border CornerRadius="28" Background="{DynamicResource SidebarBackground}"
+            BorderBrush="{DynamicResource SidebarSurface}" BorderThickness="1"
+            BoxShadow="0 24 72 0 #65000000" Margin="14" ClipToBounds="True">
+        <Grid RowDefinitions="*,Auto">
+            <Ellipse Width="360" Height="360" HorizontalAlignment="Right" VerticalAlignment="Top"
+                     Margin="0,-220,-180,0" Fill="{DynamicResource AccentSoft}" Opacity="0.34"/>
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="42,40,42,22">
+                <controls:AnimatedLogo Size="112" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       AutomationProperties.Name="Логотип Deduplicator" />
+                <StackPanel Grid.Column="1" Margin="24,0,0,0" VerticalAlignment="Center" Spacing="8">
+                    <TextBlock Text="ПОРЯДОК В ФАЙЛАХ" Classes="eyebrow"
+                               Foreground="{DynamicResource SidebarAccent}"/>
+                    <TextBlock Classes="display" FontSize="32" Text="Deduplicator"
+                               Foreground="{DynamicResource SidebarText}" />
+                    <TextBlock Text="Находит лишние копии и помогает безопасно освободить место"
+                               FontSize="14.5" LineHeight="21" TextWrapping="Wrap" MaxWidth="290"
+                               Foreground="{DynamicResource SidebarTextMuted}" />
+                </StackPanel>
+            </Grid>
+            <Border Grid.Row="1" Margin="26" Padding="16,13" CornerRadius="14"
+                    Background="{DynamicResource SidebarSurface}">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                    <TextBlock x:Name="StatusText" FontSize="13.5" FontWeight="Medium"
+                               Foreground="{DynamicResource SidebarText}"
+                               Text="{x:Static loc:Strings.SplashStarting}"
+                               AutomationProperties.Name="Состояние запуска" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconHealth}" Width="13" Height="13"
+                                  Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock Text="Полностью офлайн" FontSize="13"
+                                   Foreground="{DynamicResource SidebarTextMuted}"/>
+                    </StackPanel>
+                    <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" IsIndeterminate="True"
+                                 Height="5" Margin="0,10,0,0"
+                                 AutomationProperties.Name="Загрузка приложения" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

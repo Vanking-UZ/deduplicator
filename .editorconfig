@@ -1,0 +1,22 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.{cs,axaml,ps1}]
+indent_size = 4
+
+[*.{csproj,props,slnx,manifest,json,yml,yaml,nsi,xml}]
+indent_size = 2
+
+[*.cs]
+charset = utf-8
+
+[*.md]
+trim_trailing_whitespace = false
+
+[**/packages.lock.json]
+insert_final_newline = false

@@ -1,0 +1,423 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Deduplicator.App.ViewModels"
+        xmlns:conv="clr-namespace:Deduplicator.App.Converters"
+        x:Class="Deduplicator.App.Views.MainWindow"
+        Width="980" Height="680" MinWidth="640" MinHeight="400"
+        Background="{DynamicResource AppBackground}"
+        FontFamily="{DynamicResource ContentControlThemeFontFamily}"
+        Icon="/Assets/app-icon-256.png"
+        Title="Deduplicator">
+
+    <Window.Styles>
+        <!-- При узком окне боковая панель превращается в компактную rail-навигацию. -->
+        <Style Selector="Window:compact StackPanel#SidebarHeader">
+            <Setter Property="Margin" Value="16,22,16,14"/>
+            <Setter Property="Spacing" Value="10"/>
+        </Style>
+        <Style Selector="Window:compact TextBlock.compactHide">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="Window:compact StackPanel.compactHide">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="Window:compact ListBox.nav ListBoxItem">
+            <Setter Property="Margin" Value="10,2"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Window:compact StackPanel#SidebarFooter">
+            <Setter Property="Margin" Value="10,6,10,14"/>
+        </Style>
+        <Style Selector="Window:compact Button#SidebarHelpButton">
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Window:compact Button#BackHomeButton">
+            <Setter Property="Margin" Value="10,0,10,8"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Window.reduceMotion Button:pointerover">
+            <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+        <Style Selector="Window.reduceMotion Button:pressed">
+            <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <!-- Оболочка остаётся рабочей во время знакомства: пользователь выполняет подсвеченное действие сам. -->
+        <Grid x:Name="ShellGrid" Grid.ColumnSpan="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="232"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ===== Боковая панель ===== -->
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBackground}">
+            <DockPanel LastChildFill="True" IsEnabled="{Binding !IsDialogOpen}">
+                <!-- Спокойная фирменная зона вместо отдельной технической шапки. -->
+                <StackPanel x:Name="SidebarHeader" DockPanel.Dock="Top" Margin="20,24,20,18" Spacing="24">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Width="44" Height="44" CornerRadius="14"
+                                Background="{DynamicResource AccentGradient}"
+                                BoxShadow="0 8 24 0 #355865F2">
+                            <PathIcon Data="{StaticResource IconLogo}" Foreground="White" Width="23" Height="23"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Classes="compactHide" Margin="12,0,0,0" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{Binding AppName}" FontSize="17" FontWeight="Bold"
+                                       LetterSpacing="-0.3" Foreground="{DynamicResource SidebarText}"/>
+                            <TextBlock Text="Порядок в ваших файлах" FontSize="13"
+                                       Foreground="{DynamicResource SidebarTextMuted}"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="РАЗДЕЛЫ" Classes="eyebrow compactHide" Margin="4,0,0,0"
+                               Foreground="{DynamicResource SidebarTextMuted}"/>
+                </StackPanel>
+
+                <StackPanel x:Name="SidebarFooter" DockPanel.Dock="Bottom" Margin="14,8,14,18" Spacing="10">
+                    <Button x:Name="SidebarHelpButton" Classes="ghost" Padding="12" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            Background="{DynamicResource SidebarSurface}"
+                            Command="{Binding ShowOnboardingCommand}"
+                            ToolTip.Tip="Показать короткое обучение заново"
+                            AutomationProperties.Name="Как пользоваться программой">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Border Width="36" Height="36" CornerRadius="11"
+                                    Background="{DynamicResource SidebarSelected}">
+                                <PathIcon Data="{StaticResource IconCheckCircle}" Width="18" Height="18"
+                                          Foreground="{DynamicResource SidebarAccent}"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Classes="compactHide" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Text="Как пользоваться" FontSize="13.5" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SidebarText}"/>
+                                <TextBlock Text="Повторить знакомство" FontSize="13"
+                                           Foreground="{DynamicResource SidebarTextMuted}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="FeedbackPickerButton" Classes="ghost" Padding="12" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            Background="{DynamicResource SidebarSurface}"
+                            IsEnabled="{Binding !IsOnboardingVisible}"
+                            Command="{Binding Feedback.TogglePickerCommand}"
+                            ToolTip.Tip="Отметить несколько элементов интерфейса и оставить комментарии"
+                            AutomationProperties.Name="Отметить элементы интерфейса">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Border Width="36" Height="36" CornerRadius="11"
+                                    Background="{DynamicResource SidebarSelected}">
+                                <PathIcon Data="{StaticResource IconRename}" Width="18" Height="18"
+                                          Foreground="{DynamicResource SidebarAccent}"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Classes="compactHide" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Text="{Binding Feedback.PickerButtonText}" FontSize="13.5" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SidebarText}"/>
+                                <TextBlock Text="Выбрать и прокомментировать" FontSize="13"
+                                           Foreground="{DynamicResource SidebarTextMuted}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <StackPanel Classes="compactHide" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+                        <PathIcon Data="{StaticResource IconHealth}" Width="13" Height="13"
+                                  Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock Text="Файлы остаются на устройстве" FontSize="13"
+                                   Foreground="{DynamicResource SidebarTextMuted}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button x:Name="BackHomeButton" DockPanel.Dock="Top" Classes="ghost"
+                        Margin="10,0,10,8" Padding="12,9"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        IsVisible="{Binding CanNavigateBack}"
+                        Command="{Binding NavigateBackCommand}"
+                        AutomationProperties.Name="{Binding BackButtonText}">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
+                        <PathIcon Data="{StaticResource IconChevronLeft}" Width="16" Height="16"
+                                  Foreground="{DynamicResource SidebarTextMuted}"/>
+                        <TextBlock Classes="compactHide" Text="{Binding BackButtonText}" FontSize="13.5"
+                                   Foreground="{DynamicResource SidebarTextMuted}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <ListBox x:Name="OnboardingMainNav"
+                         Classes="nav" ItemsSource="{Binding NavItems}"
+                         SelectedItem="{Binding SelectedNav, Mode=TwoWay}"
+                         Margin="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="12" ToolTip.Tip="{Binding Tip}">
+                                <PathIcon Data="{Binding IconKey, Converter={x:Static conv:Converters.Icon}}"
+                                          Width="19" Height="19"/>
+                                <TextBlock Classes="compactHide" Text="{Binding Title}" VerticalAlignment="Center" FontSize="14.5"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- ===== Глобальная модальная подложка над САЙДБАРОМ =====
+             Диалог страница рисует сама поверх своего контента (правая колонка уже затемнена её
+             оверлеем); эта подложка закрывает только колонку навигации, чтобы модальность была
+             видна на всём окне и клики мимо диалога не переключали страницы. -->
+        <Border Grid.Column="0" Background="{DynamicResource OverlayDim}"
+                IsVisible="{Binding IsDialogOpen}"/>
+
+        <!-- ===== Контент ===== -->
+        <Border Grid.Column="1" Padding="0" Background="{DynamicResource AppBackground}">
+            <TransitioningContentControl x:Name="PageHost" Content="{Binding CurrentPage}" Margin="0">
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="0:0:0.22" />
+                </TransitioningContentControl.PageTransition>
+            </TransitioningContentControl>
+        </Border>
+        </Grid>
+
+        <!-- ===== Первое обучение: подсветка реальных элементов ===== -->
+        <!-- Локальный режим обратной связи: контуры не перехватывают нажатия. -->
+        <Canvas x:Name="FeedbackOutlineLayer" Grid.ColumnSpan="2"
+                DataContext="{Binding Feedback}"
+                IsVisible="{Binding IsPickerActive}"
+                IsHitTestVisible="False" ZIndex="900">
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Canvas.Left="{Binding OutlineX}" Canvas.Top="{Binding OutlineY}"
+                                Width="{Binding OutlineWidth}" Height="{Binding OutlineHeight}"
+                                IsVisible="{Binding IsOutlineVisible}"
+                                BorderBrush="{DynamicResource AccentBrush}" BorderThickness="3"
+                                CornerRadius="13" BoxShadow="0 0 0 4 #305865F2">
+                            <Border Width="26" Height="26" CornerRadius="13" Margin="8"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Background="{DynamicResource AccentBrush}">
+                                <TextBlock Text="{Binding Number}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           FontSize="12" FontWeight="Bold" Foreground="White"/>
+                            </Border>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Border x:Name="FeedbackHoverHighlight" IsVisible="False" IsHitTestVisible="False" ZIndex="1"
+                    BorderBrush="{DynamicResource WarningBrush}" BorderThickness="2" CornerRadius="10"
+                    BoxShadow="0 0 0 3 #30F6AD55"/>
+        </Canvas>
+
+        <!-- Панель остаётся открытой после завершения выбора: так можно спокойно
+             прокомментировать все отмеченные элементы, не возвращаясь к ним по одному. -->
+        <Border x:Name="FeedbackPanel" Grid.ColumnSpan="2" Classes="card" Width="390" MaxHeight="560"
+                Margin="0,0,24,24" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                DataContext="{Binding Feedback}" IsVisible="{Binding IsPanelOpen}"
+                Padding="18" CornerRadius="20" BoxShadow="{DynamicResource ElevatedShadow}" ZIndex="950"
+                AutomationProperties.Name="Замечания к интерфейсу">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="Замечания к интерфейсу" Classes="sectionTitle"/>
+                            <TextBlock Text="{Binding SelectionSummary}" Classes="caption" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="ghost iconButton" Margin="12,0,0,0" Command="{Binding ClosePanelCommand}"
+                                ToolTip.Tip="Закрыть панель отметок" AutomationProperties.Name="Закрыть панель отметок">
+                            <PathIcon Data="{StaticResource IconClose}" Width="17" Height="17"/>
+                        </Button>
+                    </Grid>
+
+                    <Border Background="{DynamicResource AccentSoft}" CornerRadius="12" Padding="11,9">
+                        <TextBlock Text="Жёлтая рамка показывает точный элемент под курсором. Можно отметить текст, карточку, плашку, поле, флажок, вкладку, список или кнопку. Если панель закрывает нужное место — сверните её: выбор продолжится." TextWrapping="Wrap" FontSize="13.5"/>
+                    </Border>
+
+                    <Button Classes="primary" Command="{Binding StopPickerCommand}" IsVisible="{Binding IsPickerActive}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                            <PathIcon Data="{StaticResource IconCheck}" Width="16" Height="16"/>
+                            <TextBlock Text="Готово, перейти к комментариям"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="ghost" Command="{Binding HidePickerPanelCommand}" IsVisible="{Binding IsPickerActive}"
+                            ToolTip.Tip="Скрыть панель и продолжить отмечать элементы">
+                        <TextBlock Text="Свернуть и продолжить отмечать"/>
+                    </Button>
+
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="cardFlat" Padding="11" Margin="0,0,0,8">
+                                    <StackPanel Spacing="8">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Border Width="25" Height="25" CornerRadius="13" Margin="0,0,9,0"
+                                                    Background="{DynamicResource AccentSoft}">
+                                                <TextBlock Text="{Binding Number}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           FontSize="12" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Spacing="1">
+                                                <TextBlock Text="{Binding ElementLabel}" FontSize="13.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Page}" Classes="caption" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="2" Classes="ghost iconButton"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.RemoveSelectionCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip.Tip="Убрать отметку" AutomationProperties.Name="Убрать отметку">
+                                                <PathIcon Data="{StaticResource IconClose}" Width="15" Height="15"/>
+                                            </Button>
+                                        </Grid>
+                                        <TextBox Text="{Binding Comment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 MaxLength="300" MinHeight="54" AcceptsReturn="True" TextWrapping="Wrap"
+                                                 Watermark="Что здесь хочется изменить?"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Один комментарий для всех отмеченных" FontSize="13.5" FontWeight="SemiBold"/>
+                        <TextBox Text="{Binding SharedComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="300" MinHeight="52" AcceptsReturn="True" TextWrapping="Wrap"
+                                 Watermark="Например: сделать элементы крупнее и понятнее"/>
+                        <Button Classes="tonal" Command="{Binding ApplySharedCommentCommand}" IsEnabled="{Binding CanApplySharedComment}">
+                            <TextBlock Text="Применить ко всем"/>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Общий комментарий" FontSize="13.5" FontWeight="SemiBold"/>
+                        <TextBox Text="{Binding GeneralComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="300" MinHeight="52" AcceptsReturn="True" TextWrapping="Wrap"
+                                 Watermark="Что в интерфейсе хотелось бы улучшить в целом?"/>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,*,Auto">
+                        <Button Grid.Column="0" Classes="tonal" Margin="0,0,4,0" Command="{Binding CopyReportCommand}" IsEnabled="{Binding HasDraft}">
+                            <TextBlock Text="Скопировать"/>
+                        </Button>
+                        <Button Grid.Column="1" Margin="4,0" Command="{Binding SaveDraftCommand}">
+                            <TextBlock Text="Сохранить"/>
+                        </Button>
+                        <Button Grid.Column="2" Classes="ghost iconButton" Margin="4,0,0,0" Command="{Binding ClearDraftCommand}" IsEnabled="{Binding HasDraft}"
+                                ToolTip.Tip="Очистить черновик" AutomationProperties.Name="Очистить черновик">
+                            <PathIcon Data="{StaticResource IconTrash}" Width="16" Height="16" Foreground="{DynamicResource DangerBrush}"/>
+                        </Button>
+                    </Grid>
+
+                    <TextBlock Text="{Binding StatusText}" Classes="caption" TextWrapping="Wrap"/>
+                    <TextBlock Text="Черновик хранится только на этом компьютере. В отчёт не попадают файлы, пути и текст экрана." Classes="caption" TextWrapping="Wrap"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Canvas Grid.ColumnSpan="2" IsVisible="{Binding IsOnboardingVisible}" ZIndex="1000"
+                Focusable="True" AutomationProperties.Name="Короткое знакомство с программой">
+            <!-- Подложки только объясняют фокус, но не перехватывают действия пользователя. -->
+            <Rectangle x:Name="OnboardingBlocker" Fill="#01000000" IsHitTestVisible="False"/>
+            <!-- Затемнение с «окошком» вокруг подсвеченного элемента (Data ставится из code-behind) -->
+            <Path x:Name="OnboardingMask" Fill="#80000000" IsHitTestVisible="False"/>
+            <!-- Пульсирующая рамка-подсветка вокруг цели (позиция/размер из code-behind) -->
+            <Border x:Name="OnboardingHighlight" IsHitTestVisible="False"
+                    CornerRadius="16" BorderThickness="3" BorderBrush="{DynamicResource AccentBrush}"
+                    BoxShadow="0 0 0 5 #4D5865F2">
+            </Border>
+            <!-- Карточка-пояснение рядом с целью (позиция из code-behind) -->
+            <Border x:Name="OnboardingCard" Classes="card" Width="480" Padding="28"
+                    CornerRadius="24" BoxShadow="{DynamicResource ElevatedShadow}"
+                    AutomationProperties.Name="Подсказка по использованию программы">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Spacing="16">
+                    <!-- Welcome и финал центрируются (у них нет target) и получают собственный
+                         дружелюбный визуальный акцент. Рабочие шаги остаются компактными spotlight. -->
+                    <Border Width="62" Height="62" CornerRadius="19"
+                            Background="{DynamicResource AccentGradient}"
+                            HorizontalAlignment="Left"
+                            IsVisible="{Binding IsOnboardingWelcome}">
+                        <PathIcon Data="{StaticResource IconLogo}" Width="28" Height="28" Foreground="White"/>
+                    </Border>
+                    <Border Width="62" Height="62" CornerRadius="31"
+                            Background="{DynamicResource SuccessSoft}"
+                            HorizontalAlignment="Left"
+                            IsVisible="{Binding IsOnboardingFinal}">
+                        <PathIcon Data="{StaticResource IconCheck}" Width="28" Height="28"
+                                  Foreground="{DynamicResource SuccessBrush}"/>
+                    </Border>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding OnboardingProgressText}" Classes="eyebrow"/>
+                        <TextBlock Text="{Binding OnboardingTitle}" FontSize="24" FontWeight="SemiBold" LetterSpacing="-0.45" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="8" IsVisible="{Binding IsOnboardingWelcome}">
+                        <Border Classes="onboardingBenefit">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <PathIcon Data="{StaticResource IconHealth}" Width="18" Height="18"
+                                          Foreground="{DynamicResource SuccessBrush}"/>
+                                <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="Безопасно: удаление только после вашего подтверждения"
+                                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <Border Classes="onboardingBenefit">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <PathIcon Data="{StaticResource IconDatabase}" Width="18" Height="18"
+                                          Foreground="{DynamicResource AccentBrush}"/>
+                                <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="Полностью офлайн: ваши файлы никуда не отправляются"
+                                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <Border Classes="onboardingBenefit">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <PathIcon Data="{StaticResource IconCheckCircle}" Width="18" Height="18"
+                                          Foreground="{DynamicResource IndigoBrush}"/>
+                                <TextBlock Grid.Column="1" Margin="10,0,0,0" Text="Надёжно: в каждой группе хотя бы одна копия всегда останется"
+                                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <Border CornerRadius="8" Padding="11,8" Background="{DynamicResource AccentSoft}"
+                            IsVisible="{Binding OnboardingHasTarget}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource IconChevronRight}" Width="15" Height="15"
+                                      Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding OnboardingHint}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Сделайте подсвеченное действие прямо в приложении — шаг продолжится автоматически."
+                               IsVisible="{Binding IsOnboardingActionStep}"
+                               Classes="caption" TextWrapping="Wrap"/>
+
+                    <TextBlock Text="{Binding OnboardingBody}" Classes="muted" FontSize="15.5" LineHeight="24" TextWrapping="Wrap"/>
+
+                    <ProgressBar Height="7" Minimum="0" Maximum="100" Value="{Binding OnboardingProgress}"/>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,2,0,0">
+                        <Button Grid.Column="0" Classes="ghost" Command="{Binding SkipOnboardingCommand}"
+                                IsVisible="{Binding !IsOnboardingFinal}"
+                                AutomationProperties.Name="Пропустить обучение">
+                            <TextBlock Text="Пропустить"/>
+                        </Button>
+                        <Button Grid.Column="2" Command="{Binding PreviousOnboardingCommand}"
+                                IsVisible="{Binding CanGoBack}" Margin="0,0,10,0"
+                                AutomationProperties.Name="Предыдущий шаг обучения">
+                            <TextBlock Text="Назад"/>
+                        </Button>
+                        <Button x:Name="OnboardingNextButton" Grid.Column="3" Classes="primary"
+                                Command="{Binding NextOnboardingCommand}"
+                                AutomationProperties.Name="{Binding OnboardingNextText}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding OnboardingNextText}" Foreground="White"/>
+                                <PathIcon Data="{StaticResource IconChevronRight}" Foreground="White" Width="16" Height="16"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Canvas>
+    </Grid>
+</Window>

@@ -1,0 +1,553 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             x:Class="Deduplicator.App.Views.SettingsView">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Margin="{StaticResource PagePadding}" Spacing="20" MaxWidth="980" HorizontalAlignment="Left">
+                <Border Classes="hero">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="8" MaxWidth="680" HorizontalAlignment="Left">
+                            <TextBlock Classes="eyebrow" Text="ПАРАМЕТРЫ ПРИЛОЖЕНИЯ" Foreground="#E6E8FF"/>
+                            <TextBlock Classes="display" Text="{x:Static loc:Strings.SettingsTitle}" Foreground="White"/>
+                            <TextBlock Classes="bodyLarge"
+                                       Text="Обычно менять ничего не нужно. Важные параметры безопасности уже настроены оптимально."
+                                       Foreground="White" Opacity="0.78" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="62" Height="62" CornerRadius="20"
+                                Background="#28FFFFFF" VerticalAlignment="Top">
+                            <PathIcon Data="{StaticResource IconSettings}" Width="30" Height="30" Foreground="White"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <TabControl>
+                    <!-- Основные настройки, которые понятны большинству пользователей. -->
+                    <TabItem Header="Основное">
+                        <StackPanel Spacing="16" Margin="0,16,0,4">
+                            <Border Classes="card">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconHealth}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="Безопасность"/>
+                                            <TextBlock Classes="caption" Text="Рекомендуется оставить включённой" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Border Classes="cardFlat" Padding="16">
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="Куда перемещать удалённые файлы" FontWeight="SemiBold"/>
+                                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                                           Text="Удаление всегда обратимо — файлы не стираются сразу, их можно вернуть."/>
+                                            </StackPanel>
+
+                                            <RadioButton MinHeight="0"
+                                                         IsChecked="{Binding UseRecycleBin, Mode=TwoWay}"
+                                                         ToolTip.Tip="Рекомендуется: файл легко вернуть из Корзины Windows"
+                                                         AutomationProperties.Name="Удалять в Корзину Windows">
+                                                <StackPanel Spacing="1">
+                                                    <TextBlock Text="В Корзину Windows" FontWeight="Medium"/>
+                                                    <TextBlock Classes="caption" Text="Рекомендуется. Вернуть — из Корзины Windows."/>
+                                                </StackPanel>
+                                            </RadioButton>
+
+                                            <RadioButton MinHeight="0"
+                                                         IsChecked="{Binding UseCustomFolder, Mode=TwoWay}"
+                                                         ToolTip.Tip="Складывать удалённые файлы в выбранную вами папку"
+                                                         AutomationProperties.Name="Удалять в выбранную папку">
+                                                <StackPanel Spacing="1">
+                                                    <TextBlock Text="В выбранную папку" FontWeight="Medium"/>
+                                                    <TextBlock Classes="caption" Text="Вернуть — в разделе «История»."/>
+                                                </StackPanel>
+                                            </RadioButton>
+
+                                            <StackPanel Spacing="8" Margin="30,2,0,0"
+                                                        IsEnabled="{Binding UseCustomFolder}">
+                                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                                    <TextBox Grid.Column="0" Text="{Binding QuarantinePath, Mode=TwoWay}"
+                                                             Classes="mono" FontSize="13"
+                                                             Watermark="Например: D:\Удалённые Deduplicator"
+                                                             ToolTip.Tip="{Binding QuarantinePath}"
+                                                             AutomationProperties.Name="Папка для удалённых файлов"/>
+                                                    <Button Grid.Column="1" Classes="tonal" Margin="8,0,0,0"
+                                                            Command="{Binding BrowseQuarantineCommand}"
+                                                            ToolTip.Tip="Выбрать папку для удалённых файлов"
+                                                            AutomationProperties.Name="Выбрать папку для удалённых файлов">
+                                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                                            <PathIcon Data="{StaticResource IconFolder}" Width="16" Height="16"/>
+                                                            <TextBlock Text="{x:Static loc:Strings.Browse}"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                    <Button Grid.Column="2" Classes="ghost iconButton" Margin="6,0,0,0"
+                                                            Command="{Binding OpenQuarantineFolderCommand}"
+                                                            ToolTip.Tip="Открыть папку удалённых файлов в Проводнике"
+                                                            AutomationProperties.Name="Открыть папку удалённых файлов">
+                                                        <PathIcon Data="{StaticResource IconChevronRight}" Width="16" Height="16"/>
+                                                    </Button>
+                                                </Grid>
+                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                    <Button Classes="ghost" Padding="10,6" MinHeight="0"
+                                                            Command="{Binding ResetQuarantineFolderCommand}"
+                                                            ToolTip.Tip="Вернуть стандартную папку в данных приложения"
+                                                            AutomationProperties.Name="Сбросить папку удалённых файлов">
+                                                        <TextBlock Text="Папка по умолчанию" Classes="caption"/>
+                                                    </Button>
+                                                </StackPanel>
+                                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                                           Text="Файлы, удалённые ранее, останутся там, где были — их всё так же можно вернуть в «Истории»."/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Grid ColumnDefinitions="*,260">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Static loc:Strings.SetRule}" FontWeight="SemiBold"/>
+                                            <TextBlock Classes="caption" Text="Какая копия считается основной в группе" Margin="0,3,16,0"/>
+                                        </StackPanel>
+                                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding Rules}"
+                                                  SelectedItem="{Binding SelectedRule, Mode=TwoWay}"
+                                                  ToolTip.Tip="Эта копия будет помечаться как главная в группе дублей"
+                                                  AutomationProperties.Name="Правило выбора основной копии">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="card">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconPanels}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="Внешний вид и нагрузка"/>
+                                            <TextBlock Classes="caption" Text="Подстройте программу под свой компьютер" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,260">
+                                        <TextBlock Text="{x:Static loc:Strings.SetTheme}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding Themes}"
+                                                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                                                  ToolTip.Tip="Выберите светлый, тёмный или системный режим"
+                                                  AutomationProperties.Name="Тема оформления">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*,260">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Масштаб интерфейса" FontWeight="SemiBold"/>
+                                            <TextBlock Classes="caption" Text="Увеличивает основные надписи без изменения разрешения экрана"
+                                                       Margin="0,3,16,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding UiScales}"
+                                                  SelectedItem="{Binding SelectedUiScale, Mode=TwoWay}"
+                                                  AutomationProperties.Name="Масштаб интерфейса">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <Border Classes="cardFlat" Padding="14">
+                                        <CheckBox IsChecked="{Binding ReduceMotion, Mode=TwoWay}"
+                                                  Content="Уменьшить движение и анимации"
+                                                  ToolTip.Tip="Отключает декоративное вращение, подпрыгивание карточек и плавные переходы"
+                                                  AutomationProperties.Name="Уменьшить движение и анимации"/>
+                                    </Border>
+
+                                    <Grid ColumnDefinitions="*,260">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Нагрузка при проверке" FontWeight="SemiBold"/>
+                                            <TextBlock Classes="caption" Text="Выберите понятный режим — число задач программа рассчитает сама"
+                                                       Margin="0,3,16,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                                  ItemsSource="{Binding PerformanceModes}"
+                                                  SelectedItem="{Binding SelectedPerformanceMode, Mode=TwoWay}"
+                                                  AutomationProperties.Name="Режим нагрузки при проверке">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <Border Classes="cardFlat" Padding="14" Background="{DynamicResource AccentSoft}">
+                                        <TextBlock Text="{Binding PerformanceModeHint}" TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource AccentBrush}"/>
+                                    </Border>
+
+                                    <Expander Header="Экспертные настройки нагрузки">
+                                        <StackPanel Spacing="12" Margin="0,12,0,0">
+                                            <CheckBox IsChecked="{Binding UseExpertParallelism, Mode=TwoWay}"
+                                                      Content="Задать количество параллельных задач вручную"
+                                                      AutomationProperties.Name="Использовать ручное количество параллельных задач"/>
+                                            <Grid ColumnDefinitions="*,160" IsEnabled="{Binding UseExpertParallelism}">
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <TextBlock Text="{x:Static loc:Strings.SetParallelism}" FontWeight="SemiBold"/>
+                                                    <TextBlock Classes="caption" Text="Только для диагностики и тонкой настройки"
+                                                               Margin="0,3,16,0"/>
+                                                </StackPanel>
+                                                <NumericUpDown Grid.Column="1" Minimum="1" Maximum="16" Increment="1"
+                                                               Value="{Binding MaxParallelism, Mode=TwoWay}" ValueChanged="OnNumericChanged"
+                                                               ToolTip.Tip="Слишком большое число может замедлить обычный жёсткий диск"
+                                                               AutomationProperties.Name="Ручное количество параллельных задач"/>
+                                            </Grid>
+                                            <Border Classes="cardFlat" Padding="14">
+                                                <StackPanel Spacing="6">
+                                                    <CheckBox IsChecked="{Binding UseElevatedMftHelper, Mode=TwoWay}"
+                                                              Content="Ускорять полный обход NTFS через отдельный MFT-помощник"
+                                                              AutomationProperties.Name="Использовать отдельный MFT-помощник"/>
+                                                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                                                               Text="Только после нажатия «Начать проверку» Windows может один раз запросить подтверждение. Основное приложение остаётся с обычными правами. Если подтверждение отменено, помощник не подписан или программа запущена из переносимой папки, проверка без ошибки продолжится обычным способом. Инкрементальный журнал USN этим режимом не ускоряется."/>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </Expander>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Точность и фильтры сканирования. -->
+                    <TabItem Header="Поиск">
+                        <StackPanel Spacing="16" Margin="0,16,0,4">
+                            <Border Classes="card">
+                                <StackPanel Spacing="18">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconSearch}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="Качество поиска похожих файлов"/>
+                                            <TextBlock Classes="caption" Text="Больше процент — строже сравнение и меньше случайных совпадений."
+                                                       Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="7">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Text="{x:Static loc:Strings.SetImageThreshold}" FontWeight="SemiBold"/>
+                                            <Border Grid.Column="1" Classes="badge" Background="{DynamicResource AccentSoft}">
+                                                <TextBlock Text="{Binding ImagePercentText}" Foreground="{DynamicResource AccentBrush}"/>
+                                            </Border>
+                                        </Grid>
+                                        <Slider Minimum="0.5" Maximum="1.0" Value="{Binding ImageThreshold, Mode=TwoWay}"
+                                                ToolTip.Tip="Если показывает слишком много похожих фото, сдвиньте вправо"
+                                                AutomationProperties.Name="Строгость сравнения изображений"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="7">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Text="{x:Static loc:Strings.SetAudioThreshold}" FontWeight="SemiBold"/>
+                                            <Border Grid.Column="1" Classes="badge" Background="{DynamicResource AccentSoft}">
+                                                <TextBlock Text="{Binding AudioPercentText}" Foreground="{DynamicResource AccentBrush}"/>
+                                            </Border>
+                                        </Grid>
+                                        <Slider Minimum="0.5" Maximum="1.0" Value="{Binding AudioThreshold, Mode=TwoWay}"
+                                                ToolTip.Tip="Если показывает слишком много похожей музыки, сдвиньте вправо"
+                                                AutomationProperties.Name="Строгость сравнения музыки"/>
+                                    </StackPanel>
+
+                                    <Border Classes="cardFlat" Padding="14">
+                                        <StackPanel Spacing="4">
+                                            <CheckBox IsChecked="{Binding ComputePixelHash, Mode=TwoWay}"
+                                                      Content="{x:Static loc:Strings.SetPixelHash}"
+                                                      ToolTip.Tip="Включайте, если важнее точность, чем скорость"/>
+                                            <CheckBox IsChecked="{Binding RotationInvariant, Mode=TwoWay}"
+                                                      Content="{x:Static loc:Strings.SetRotation}"
+                                                      ToolTip.Tip="Помогает находить повёрнутые копии фото"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="card">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconSort}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.SetScanFilters}"/>
+                                            <TextBlock Classes="caption" Text="Не тратьте время на заведомо ненужные данные" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <CheckBox IsChecked="{Binding SkipHiddenSystem, Mode=TwoWay}"
+                                              Content="{x:Static loc:Strings.SetSkipHidden}"
+                                              ToolTip.Tip="Рекомендуется оставить включённым"/>
+                                    <Grid ColumnDefinitions="*,160">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Static loc:Strings.SetMinSize}" FontWeight="SemiBold"/>
+                                            <TextBlock Classes="caption" Text="0 означает искать файлы любого размера" Margin="0,3,16,0"/>
+                                        </StackPanel>
+                                        <NumericUpDown Grid.Column="1" Minimum="0" Maximum="1000000" Increment="1"
+                                                       Value="{Binding MinFileSizeMb, Mode=TwoWay}" ValueChanged="OnNumericChanged"
+                                                       ToolTip.Tip="0 означает искать файлы любого размера"
+                                                       AutomationProperties.Name="Минимальный размер файла в мегабайтах"/>
+                                    </Grid>
+                                    <StackPanel Spacing="7">
+                                        <TextBlock Text="{x:Static loc:Strings.SetExcludedExt}" FontWeight="SemiBold"/>
+                                        <TextBox Text="{Binding ExcludedExtensions, Mode=TwoWay}" Watermark=".tmp, .log, .bak"
+                                                 ToolTip.Tip="Например: .tmp, .log, .bak"
+                                                 AutomationProperties.Name="Исключённые расширения файлов"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Папки и поведение на внешних дисках. -->
+                    <TabItem Header="Папки и диски">
+                        <StackPanel Spacing="16" Margin="0,16,0,4">
+                            <Border Classes="card">
+                                <StackPanel Spacing="14">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconHealth}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.SetReferenceFolders}"/>
+                                            <TextBlock Classes="caption" Text="Файлы из этих папок защищены от автоматического выбора" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <ItemsControl ItemsSource="{Binding ReferenceFolders}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Classes="cardFlat" Margin="0,3" Padding="12">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                                   Classes="mono" ToolTip.Tip="{Binding}"/>
+                                                        <Button Grid.Column="1" Classes="ghost"
+                                                                Command="{Binding $parent[ItemsControl].DataContext.RemoveReferenceFolderCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                ToolTip.Tip="Убрать папку из списка защищённых"
+                                                                AutomationProperties.Name="Убрать защищённую папку">
+                                                            <TextBlock Text="{x:Static loc:Strings.Remove}"/>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <Button Classes="tonal" HorizontalAlignment="Left" Command="{Binding AddReferenceFolderCommand}"
+                                            ToolTip.Tip="Добавить папку, файлы из которой нельзя удалять автоматически"
+                                            AutomationProperties.Name="Добавить защищённую папку">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconFolderPlus}"/>
+                                            <TextBlock Text="{x:Static loc:Strings.AddFolder}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="card">
+                                <StackPanel Spacing="14">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconUpdate}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="Слежение за новыми дубликатами"/>
+                                            <TextBlock Classes="caption" Text="Работает только пока приложение открыто" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <CheckBox IsChecked="{Binding SentinelEnabled, Mode=TwoWay}"
+                                              Content="Следить за новыми дубликатами (пока программа открыта)"
+                                              ToolTip.Tip="Если в выбранные папки попадёт копия уже известного файла, появится уведомление"
+                                              AutomationProperties.Name="Следить за новыми дубликатами"/>
+                                    <TextBlock Classes="bodyLarge muted" TextWrapping="Wrap"
+                                               Text="Программа лишь сообщает о находке — ничего не удаляет и не меняет."/>
+                                    <ItemsControl ItemsSource="{Binding SentinelFolders}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Classes="cardFlat" Margin="0,3" Padding="12">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                                   Classes="mono" ToolTip.Tip="{Binding}"/>
+                                                        <Button Grid.Column="1" Classes="ghost"
+                                                                Command="{Binding $parent[ItemsControl].DataContext.RemoveSentinelFolderCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                ToolTip.Tip="Перестать следить за этой папкой"
+                                                                AutomationProperties.Name="Убрать папку из слежения">
+                                                            <TextBlock Text="{x:Static loc:Strings.Remove}"/>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <Button Classes="tonal" HorizontalAlignment="Left" Command="{Binding AddSentinelFolderCommand}"
+                                            ToolTip.Tip="Добавить папку, за которой нужно следить (вместе с подпапками)"
+                                            AutomationProperties.Name="Добавить папку для слежения">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconFolderPlus}"/>
+                                            <TextBlock Text="{x:Static loc:Strings.AddFolder}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="card">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconDatabase}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="Внешние диски и служебные пути"/>
+                                            <TextBlock Classes="caption" Text="Дополнительные возможности хранения" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Border Classes="cardFlat" Padding="14">
+                                        <CheckBox IsChecked="{Binding PortableIndexEnabled, Mode=TwoWay}"
+                                                  Content="Запоминать проверку на флешках и внешних дисках"
+                                                  ToolTip.Tip="После проверки на флешке остаётся небольшой скрытый служебный файл. С ним другой компьютер с этой программой проверит её заметно быстрее. Перед удалением файлы всё равно проверяются заново."
+                                                  AutomationProperties.Name="Сохранять переносимый индекс на внешних дисках"/>
+                                    </Border>
+                                    <StackPanel Spacing="7">
+                                        <TextBlock Text="{x:Static loc:Strings.SetFpcalc}" FontWeight="SemiBold"/>
+                                        <TextBox Text="{Binding FpcalcPath, Mode=TwoWay}" Watermark="fpcalc.exe"
+                                                 ToolTip.Tip="Нужно только для поиска похожей музыки по звучанию"
+                                                 AutomationProperties.Name="Путь к fpcalc"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Width="15" Height="15" Data="{StaticResource IconCheckCircle}"
+                                                      Foreground="{DynamicResource SuccessBrush}" IsVisible="{Binding FpcalcAvailable}"/>
+                                            <PathIcon Width="15" Height="15" Data="{StaticResource IconWarning}"
+                                                      Foreground="{DynamicResource WarningBrush}" IsVisible="{Binding !FpcalcAvailable}"/>
+                                            <TextBlock Text="{Binding FpcalcStatus}" Classes="caption" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Обновления и сведения для поддержки. -->
+                    <TabItem Header="Система">
+                        <StackPanel Spacing="16" Margin="0,16,0,4">
+                            <Border Classes="card">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconUpdate}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.SetUpdates}"/>
+                                            <TextBlock Text="{Binding CurrentVersionText}" Classes="caption" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <CheckBox IsChecked="{Binding CheckUpdatesEnabled, Mode=TwoWay}"
+                                              Content="{x:Static loc:Strings.SetCheckUpdates}"
+                                              ToolTip.Tip="Можно выключить для полностью офлайн-работы"
+                                              AutomationProperties.Name="Автоматически проверять обновления"/>
+                                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                                               Text="Программа сама проверяет новые версии на GitHub при запуске и только сообщает о них уведомлением. Скачивание и установка не выполняются без вашего действия."/>
+                                    <WrapPanel>
+                                        <Button Classes="tonal" Command="{Binding CheckUpdatesCommand}" Margin="0,0,10,0"
+                                                ToolTip.Tip="Проверить, есть ли новая версия"
+                                                AutomationProperties.Name="Проверить обновления сейчас">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <PathIcon Data="{StaticResource IconUpdate}"/>
+                                                <TextBlock Text="{x:Static loc:Strings.CheckNow}"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Classes="primary" Command="{Binding OpenReleaseCommand}"
+                                                IsVisible="{Binding CanOpenRelease}" Margin="0,0,10,0"
+                                                AutomationProperties.Name="Открыть новую версию">
+                                            <TextBlock Text="{x:Static loc:Strings.UpdateOpen}"/>
+                                        </Button>
+                                        <TextBlock Text="{Binding UpdateStatus}" Classes="muted" VerticalAlignment="Center"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="card">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Classes="iconTile">
+                                            <PathIcon Data="{StaticResource IconExport}" Width="21" Height="21"
+                                                      Foreground="{DynamicResource AccentBrush}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.SetDiagnostics}"/>
+                                            <TextBlock Classes="caption" Text="Эти сведения помогают быстрее разобраться с проблемой" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Border Classes="cardFlat" Padding="14">
+                                        <SelectableTextBlock Text="{Binding DiagnosticsText}" Classes="mono" FontSize="13"/>
+                                    </Border>
+                                    <WrapPanel>
+                                        <Button Classes="tonal" Command="{Binding CopyDiagnosticsCommand}" Margin="0,0,10,0"
+                                                ToolTip.Tip="Скопировать версию, режим, права и пути логов — пригодится для поддержки"
+                                                AutomationProperties.Name="Скопировать диагностику">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <PathIcon Data="{StaticResource IconCopy}"/>
+                                                <TextBlock Text="{x:Static loc:Strings.CopyDiagnostics}"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Classes="ghost" Command="{Binding OpenLogFolderCommand}" Margin="0,0,10,0"
+                                                Content="{x:Static loc:Strings.OpenLogFolder}"
+                                                AutomationProperties.Name="Открыть папку журналов"/>
+                                        <TextBlock Text="{Binding DiagnosticsStatus}" Classes="muted" VerticalAlignment="Center"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Постоянная панель сохранения: действие не теряется внизу длинной страницы. -->
+        <Border Grid.Row="1" Background="{DynamicResource SurfaceRaised}"
+                BorderBrush="{DynamicResource SurfaceBorder}" BorderThickness="0,1,0,0"
+                Padding="32,12">
+            <Grid ColumnDefinitions="*,Auto" MaxWidth="980" HorizontalAlignment="Stretch">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center"
+                            IsVisible="{Binding Saved}">
+                    <PathIcon Data="{StaticResource IconCheckCircle}" Width="18" Height="18"
+                              Foreground="{DynamicResource SuccessBrush}"/>
+                    <TextBlock Text="Настройки сохранены" Foreground="{DynamicResource SuccessBrush}" FontWeight="SemiBold"/>
+                </StackPanel>
+                <Button Grid.Column="1" Classes="primary" Command="{Binding SaveCommand}"
+                        ToolTip.Tip="Сохранить изменения настроек"
+                        AutomationProperties.Name="Сохранить настройки">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconCheck}"/>
+                        <TextBlock Text="{x:Static loc:Strings.Save}"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

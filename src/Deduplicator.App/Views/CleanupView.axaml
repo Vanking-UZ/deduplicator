@@ -1,0 +1,259 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             x:Class="Deduplicator.App.Views.CleanupView">
+
+    <Panel>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      IsEnabled="{Binding !ShowDeleteConfirm}">
+        <Grid RowDefinitions="Auto,Auto,Auto" Margin="{StaticResource PagePadding}">
+            <Border Grid.Row="0" Classes="hero" Margin="0,0,0,20">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="8" MaxWidth="670" HorizontalAlignment="Left">
+                        <TextBlock Classes="eyebrow" Text="БЕЗОПАСНАЯ ОЧИСТКА" Foreground="#E6E8FF"/>
+                        <TextBlock Classes="display" Text="{x:Static loc:Strings.CleanupTitle}" Foreground="White"/>
+                        <TextBlock Classes="bodyLarge" Text="{x:Static loc:Strings.CleanupSubtitle}"
+                                   Foreground="White" Opacity="0.78" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Width="62" Height="62" CornerRadius="20"
+                            Background="#28FFFFFF" VerticalAlignment="Top">
+                        <PathIcon Data="{StaticResource IconBroom}" Width="30" Height="30" Foreground="White"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border x:Name="OnboardingCleanupOptions" Grid.Row="1" Classes="card" Margin="0,0,0,16">
+                <StackPanel Spacing="18">
+                    <StackPanel Spacing="12">
+                        <Border Classes="cardFlat">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Classes="iconTile">
+                                        <PathIcon Data="{StaticResource IconHdd}" Width="21" Height="21"
+                                                  Foreground="{DynamicResource AccentBrush}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.ScanSelectVolumes}"/>
+                                        <TextBlock Classes="caption" Text="Где искать ненужные файлы" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ItemsControl ItemsSource="{Binding Roots}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="0,2"
+                                                      AutomationProperties.Name="{Binding DisplayName}">
+                                                <StackPanel Orientation="Horizontal" Spacing="9">
+                                                    <PathIcon Data="{StaticResource IconHdd}" Width="16" Height="16"
+                                                              Foreground="{DynamicResource TextSecondary}"/>
+                                                    <TextBlock Text="{Binding DisplayName}" Classes="bodyLarge"/>
+                                                </StackPanel>
+                                            </CheckBox>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="cardFlat">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,4">
+                                    <Border Classes="iconTile">
+                                        <PathIcon Data="{StaticResource IconSearch}" Width="21" Height="21"
+                                                  Foreground="{DynamicResource AccentBrush}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Classes="sectionTitle" Text="{x:Static loc:Strings.CleanupWhat}"/>
+                                        <TextBlock Classes="caption" Text="Можно изменить перед запуском" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <CheckBox IsChecked="{Binding EmptyFolders, Mode=TwoWay}"
+                                          Content="{x:Static loc:Strings.CleanupEmptyFolders}"
+                                          ToolTip.Tip="Папки без файлов внутри"/>
+                                <CheckBox IsChecked="{Binding ZeroByte, Mode=TwoWay}"
+                                          Content="{x:Static loc:Strings.CleanupZeroByte}"
+                                          ToolTip.Tip="Пустые файлы, которые ничего не весят"/>
+                                <CheckBox IsChecked="{Binding Temp, Mode=TwoWay}"
+                                          Content="{x:Static loc:Strings.CleanupTemp}"
+                                          ToolTip.Tip="Временные файлы программ"/>
+                                <CheckBox IsChecked="{Binding Broken, Mode=TwoWay}"
+                                          Content="{x:Static loc:Strings.CleanupBroken}"
+                                          ToolTip.Tip="Ярлыки, которые ведут в никуда"/>
+                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                    <CheckBox Grid.Column="0" IsChecked="{Binding Large, Mode=TwoWay}"
+                                              Content="{x:Static loc:Strings.CleanupLarge}" VerticalAlignment="Center"
+                                              ToolTip.Tip="Показать большие файлы для ручной проверки"/>
+                                    <NumericUpDown Grid.Column="1" Width="118" Margin="10,0,0,0"
+                                                   Minimum="1" Maximum="100000" Increment="100"
+                                                   Value="{Binding LargeThresholdMb, Mode=TwoWay}" IsEnabled="{Binding Large}"/>
+                                    <TextBlock Grid.Column="2" Text="МБ" VerticalAlignment="Center" Classes="caption" Margin="8,0,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <Border Classes="cardFlat" Padding="14">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto" RowDefinitions="Auto,Auto">
+                            <Button Grid.Column="0" Classes="primary" Command="{Binding ScanCommand}"
+                                    IsEnabled="{Binding !Busy}"
+                                    ToolTip.Tip="Сначала только найти ненужные файлы, ничего не удаляя"
+                                    AutomationProperties.Name="Начать безопасный поиск ненужных файлов"
+                                    AutomationProperties.HelpText="Только находит файлы и ничего не удаляет">
+                                <StackPanel Orientation="Horizontal" Spacing="9">
+                                    <PathIcon Data="{StaticResource IconSearch}"/>
+                                    <TextBlock Text="{x:Static loc:Strings.CleanupScan}"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="1" Classes="danger" Command="{Binding CancelScanCommand}"
+                                    IsVisible="{Binding IsScanning}" Margin="10,0,0,0"
+                                    ToolTip.Tip="Остановить поиск ненужных файлов"
+                                    AutomationProperties.Name="Остановить поиск ненужных файлов">
+                                <TextBlock Text="{x:Static loc:Strings.Cancel}"/>
+                            </Button>
+                            <TextBlock Grid.Column="2" Text="{Binding Status}" VerticalAlignment="Center"
+                                       Classes="bodyLarge muted" Margin="16,0" TextTrimming="CharacterEllipsis"/>
+                            <ProgressBar Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding ProgressValue}"
+                                         IsIndeterminate="{Binding ProgressIndeterminate}" Width="150"
+                                         VerticalAlignment="Center" IsVisible="{Binding Busy}"
+                                         AutomationProperties.Name="Ход поиска ненужных файлов"/>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Text="{Binding ProgressDetails}"
+                                       Classes="caption" Margin="0,10,0,0" IsVisible="{Binding Busy}"
+                                       AutomationProperties.Name="Состояние длительной операции"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2" Classes="card" Padding="8">
+                <Grid RowDefinitions="Auto,Auto,Auto">
+                    <Border Grid.Row="0" Classes="cardFlat" Margin="2,2,2,8" Padding="14">
+                        <Grid RowDefinitions="Auto,Auto">
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Результаты проверки" Classes="sectionTitle"/>
+                                    <TextBlock Text="{Binding Summary}" Classes="muted"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedSummaryText}" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}"
+                                           IsVisible="{Binding SelectedSummaryText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            </Grid>
+                            <WrapPanel Grid.Row="1" Margin="0,12,0,0">
+                                <Button Classes="tonal" Command="{Binding SelectAllCommand}" Margin="0,0,8,0"
+                                        ToolTip.Tip="Отметить всё найденное, КРОМЕ больших файлов — их отмечайте вручную (это могут быть личные данные)"
+                                        AutomationProperties.Name="Выбрать все безопасные результаты">
+                                    <TextBlock Text="{x:Static loc:Strings.FmSelectAll}"/>
+                                </Button>
+                                <Button Classes="ghost" Command="{Binding ClearSelectionCommand}" Margin="0,0,8,0"
+                                        ToolTip.Tip="Снять все отметки"
+                                        AutomationProperties.Name="Снять выбор со всех результатов">
+                                    <TextBlock Text="{x:Static loc:Strings.FmClear}"/>
+                                </Button>
+                                <Button Classes="danger" Command="{Binding DeleteSelectedCommand}"
+                                        ToolTip.Tip="Переместить отмеченное в корзину после подтверждения"
+                                        AutomationProperties.Name="Удалить выбранные ненужные файлы"
+                                        AutomationProperties.HelpText="Перед удалением будет показано подтверждение">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <PathIcon Data="{StaticResource IconTrash}"/>
+                                        <TextBlock Text="{x:Static loc:Strings.CleanupDeleteSelected}"/>
+                                    </StackPanel>
+                                </Button>
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
+
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Classes="row" Margin="6,2" Padding="12,8">
+                                        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      VerticalAlignment="Center" Margin="0,0,12,0"
+                                                      AutomationProperties.Name="Выбрать файл"/>
+                                            <Border Grid.Column="1" Classes="badge" Background="{DynamicResource SurfaceAlt}"
+                                                    BorderBrush="{DynamicResource SurfaceBorder}" BorderThickness="1"
+                                                    VerticalAlignment="Center" Margin="0,0,12,0">
+                                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                                    <PathIcon Data="{Binding Icon}" Width="15" Height="15"
+                                                              Foreground="{DynamicResource TextSecondary}"/>
+                                                    <TextBlock Text="{Binding KindText}"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <TextBlock Grid.Column="2" Text="{Binding Path}" Classes="bodyLarge mono"
+                                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                                       ToolTip.Tip="{Binding Path}"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding SizeText}" Classes="caption"
+                                                       FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,4,0"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Border Grid.Row="2" Classes="cardFlat" Margin="6,10,6,6" Padding="12"
+                            IsVisible="{Binding HasResults}">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding PageStatusText}"
+                                       Classes="bodyLarge" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+                                <Button Classes="ghost" Command="{Binding ShowPreviousCommand}"
+                                        IsVisible="{Binding HasPreviousItems}" Margin="0,0,8,0"
+                                        AutomationProperties.Name="Показать предыдущую страницу результатов">
+                                    <TextBlock Text="Назад"/>
+                                </Button>
+                                <Button Classes="tonal" Command="{Binding ShowMoreCommand}"
+                                        IsVisible="{Binding HasMoreItems}"
+                                        AutomationProperties.Name="Показать следующую порцию результатов">
+                                    <TextBlock Text="{x:Static loc:Strings.ShowMore}"/>
+                                </Button>
+                            </WrapPanel>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,6,0,0"
+                                       Text="Выбор сохраняется между страницами; массовые действия применяются ко всему найденному списку."
+                                       Classes="caption" TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+        </ScrollViewer>
+
+        <!-- Безопасное подтверждение удаления. -->
+        <Border IsVisible="{Binding ShowDeleteConfirm}" Background="{DynamicResource OverlayDim}" ZIndex="100"
+                KeyboardNavigation.TabNavigation="Cycle">
+            <Border Classes="card" MaxWidth="500" Margin="24"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Padding="26"
+                    KeyboardNavigation.TabNavigation="Cycle">
+                <StackPanel Spacing="18">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Border Classes="iconTile" Background="{DynamicResource DangerSoft}">
+                            <PathIcon Data="{StaticResource IconTrash}" Width="22" Height="22"
+                                      Foreground="{DynamicResource DangerBrush}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="h2" Text="{x:Static loc:Strings.ConfirmDeleteTitle}"/>
+                            <TextBlock Classes="caption" Text="Сначала внимательно проверьте выбранное." Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="{Binding DeleteConfirmText}" TextWrapping="Wrap" Classes="bodyLarge muted"/>
+                    <Border Classes="cardFlat" Background="{DynamicResource WarningSoft}" Padding="12">
+                        <TextBlock Text="Файлы будут перемещены в корзину, если она включена в настройках."
+                                   TextWrapping="Wrap"/>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                        <Button x:Name="DeleteCancelButton" Command="{Binding CancelDeleteCommand}"
+                                AutomationProperties.Name="Отменить удаление файлов">
+                            <TextBlock Text="{x:Static loc:Strings.Cancel}"/>
+                        </Button>
+                        <Button Classes="danger" Command="{Binding ConfirmDeleteCommand}"
+                                AutomationProperties.Name="Подтвердить удаление файлов">
+                            <TextBlock Text="{x:Static loc:Strings.Delete}"/>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Panel>
+</UserControl>

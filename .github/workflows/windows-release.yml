@@ -1,0 +1,165 @@
+name: Windows CI and release package
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+jobs:
+  windows-release:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      SIGNING_CERT_BASE64: ${{ secrets.WINDOWS_SIGNING_CERT_BASE64 }}
+      SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERT_PASSWORD }}
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Use pinned .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Resolve product version
+        id: version
+        run: |
+          [xml]$props = Get-Content -LiteralPath Directory.Build.props
+          $version = [string]$props.Project.PropertyGroup.VersionPrefix
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            if ($env:GITHUB_REF_NAME -notmatch '^v(\d+\.\d+\.\d+)$') {
+              throw "Release tags must use vMAJOR.MINOR.PATCH. Got: $env:GITHUB_REF_NAME"
+            }
+            $version = $Matches[1]
+          }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Version: $version"
+
+      - name: Restore locked dependencies
+        run: dotnet restore Deduplicator.slnx --locked-mode /p:VersionPrefix=${{ steps.version.outputs.version }}
+
+      - name: Build Release
+        run: dotnet build Deduplicator.slnx -c Release --no-restore /p:VersionPrefix=${{ steps.version.outputs.version }}
+
+      - name: Run tests
+        run: dotnet test Deduplicator.slnx -c Release --no-build --no-restore /p:VersionPrefix=${{ steps.version.outputs.version }}
+
+      - name: Audit direct and transitive NuGet vulnerabilities
+        run: ./scripts/audit-vulnerabilities.ps1 -Solution ./Deduplicator.slnx -NoRestore
+
+      - name: Publish self-contained win-x64 app
+        run: ./scripts/publish-win-x64.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Require a signing certificate for release tags
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and [string]::IsNullOrWhiteSpace($env:SIGNING_CERT_BASE64)) {
+            throw 'Release tags require WINDOWS_SIGNING_CERT_BASE64 and WINDOWS_SIGNING_CERT_PASSWORD secrets.'
+          }
+
+      - name: Sign application and MFT helper when credentials are configured
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERT_BASE64)) {
+            Write-Warning 'No signing certificate configured. This non-tag CI artifact remains unsigned.'
+            exit 0
+          }
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERT_PASSWORD)) {
+            throw 'WINDOWS_SIGNING_CERT_PASSWORD is missing.'
+          }
+          $pfx = Join-Path $env:RUNNER_TEMP 'deduplicator-signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:SIGNING_CERT_BASE64))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Filter signtool.exe -Recurse |
+            Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw 'signtool.exe was not found on the runner.' }
+          $binaries = @(
+            './dist/Deduplicator-win-x64/Deduplicator.exe',
+            './dist/Deduplicator-win-x64/Deduplicator.MftHelper.exe'
+          )
+          foreach ($binary in $binaries) {
+            & $signtool.FullName sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com `
+              /f $pfx /p $env:SIGNING_CERT_PASSWORD $binary
+            if ($LASTEXITCODE -ne 0) { throw "Signing failed for $binary." }
+          }
+          "SIGNTOOL_PATH=$($signtool.FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "SIGNING_PFX_PATH=$pfx" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Install NSIS
+        run: choco install nsis --yes --no-progress
+
+      - name: Build installer
+        run: ./scripts/build-installer.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Sign installer when credentials are configured
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERT_BASE64)) { exit 0 }
+          $setup = "./artifacts/Deduplicator-Setup-${{ steps.version.outputs.version }}.exe"
+          & $env:SIGNTOOL_PATH sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com `
+            /f $env:SIGNING_PFX_PATH /p $env:SIGNING_CERT_PASSWORD $setup
+          if ($LASTEXITCODE -ne 0) { throw 'Installer signing failed.' }
+
+      - name: Smoke-test silent install and uninstall
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $setup = (Resolve-Path "./artifacts/Deduplicator-Setup-$version.exe").Path
+          $installDir = Join-Path $env:RUNNER_TEMP 'DeduplicatorInstalled'
+          $install = Start-Process -FilePath $setup -ArgumentList @('/S', "/D=$installDir") -Wait -PassThru
+          if ($install.ExitCode -ne 0) { throw "Installer exited with $($install.ExitCode)." }
+          $exe = Join-Path $installDir 'Deduplicator.exe'
+          $helper = Join-Path $installDir 'Deduplicator.MftHelper.exe'
+          if (-not (Test-Path $exe)) { throw 'Installed application is missing.' }
+          if (-not (Test-Path $helper)) { throw 'Installed MFT helper is missing.' }
+          if (Test-Path (Join-Path $installDir 'Deduplicator.portable')) {
+            throw 'Program Files installer must not contain the portable data marker.'
+          }
+          if ((Get-Item $exe).VersionInfo.FileVersion -ne "$version.0") { throw 'Installed application version mismatch.' }
+          if ((Get-Item $helper).VersionInfo.FileVersion -ne "$version.0") { throw 'Installed MFT helper version mismatch.' }
+          $uninstall = Start-Process -FilePath (Join-Path $installDir 'uninstall.exe') -ArgumentList '/S' -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstaller exited with $($uninstall.ExitCode)." }
+          Start-Sleep -Seconds 2
+          if (Test-Path $exe) { throw 'Silent uninstall left the application executable behind.' }
+
+      - name: Create release archive and checksums
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $zip = "./artifacts/Deduplicator-$version-win-x64.zip"
+          Compress-Archive -Path ./dist/Deduplicator-win-x64/* -DestinationPath $zip -Force
+          $files = @("./artifacts/Deduplicator-Setup-$version.exe", $zip)
+          $lines = foreach ($file in $files) {
+            $item = Get-Item $file
+            $hash = (Get-FileHash $item.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash *$($item.Name)"
+          }
+          $lines | Set-Content ./artifacts/SHA256SUMS.txt -Encoding ascii
+
+      - name: Verify signatures when signing is enabled
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERT_BASE64)) { exit 0 }
+          $targets = @(
+            './dist/Deduplicator-win-x64/Deduplicator.exe',
+            './dist/Deduplicator-win-x64/Deduplicator.MftHelper.exe',
+            './artifacts/Deduplicator-Setup-${{ steps.version.outputs.version }}.exe'
+          )
+          foreach ($target in $targets) {
+            $signature = Get-AuthenticodeSignature $target
+            if ($signature.Status -ne 'Valid') { throw "$target signature is $($signature.Status)." }
+          }
+
+      - name: Upload checked release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deduplicator-windows-${{ steps.version.outputs.version }}
+          path: |
+            artifacts/Deduplicator-Setup-${{ steps.version.outputs.version }}.exe
+            artifacts/Deduplicator-${{ steps.version.outputs.version }}-win-x64.zip
+            artifacts/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14

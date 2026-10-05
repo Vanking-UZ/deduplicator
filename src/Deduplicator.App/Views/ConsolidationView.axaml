@@ -1,0 +1,381 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             x:Class="Deduplicator.App.Views.ConsolidationView">
+
+    <UserControl.Styles>
+        <Style Selector="Border.wizardStepNumber">
+            <Setter Property="Width" Value="42"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="CornerRadius" Value="21"/>
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Border.wizardMetric">
+            <Setter Property="Background" Value="{DynamicResource SurfaceAlt}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="15,13"/>
+        </Style>
+        <Style Selector="Border.wizardSource">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaised}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="5,2"/>
+        </Style>
+        <Style Selector="Border.wizardSource:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*" Margin="{StaticResource PagePadding}">
+        <StackPanel Grid.Row="0" Margin="0,0,0,20" Spacing="5">
+            <TextBlock Classes="eyebrow" Text="БЕЗОПАСНЫЙ МАСТЕР"/>
+            <TextBlock Classes="h1" Text="{x:Static loc:Strings.ConsolidationTitle}"/>
+            <TextBlock Classes="muted bodyLarge" Text="{x:Static loc:Strings.ConsolidationSubtitle}"
+                       TextWrapping="Wrap" MaxWidth="820" HorizontalAlignment="Left"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="18" MaxWidth="1040" HorizontalAlignment="Stretch">
+
+                <!-- Постоянная карта процесса: пользователь всегда понимает, где находится. -->
+                <Border Classes="cardFlat" Padding="12">
+                    <StackPanel Spacing="8">
+                        <Border Background="{DynamicResource SurfaceAlt}" CornerRadius="12" Padding="10,8">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border Grid.Column="0" Classes="wizardStepNumber" Width="34" Height="34" CornerRadius="17">
+                                    <TextBlock Text="1" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="1">
+                                    <TextBlock FontWeight="SemiBold" Text="Выберите диски"/>
+                                    <TextBlock Classes="caption" Text="Откуда взять файлы" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Background="{DynamicResource SurfaceAlt}" CornerRadius="12" Padding="10,8">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border Grid.Column="0" Classes="wizardStepNumber" Width="34" Height="34" CornerRadius="17">
+                                    <TextBlock Text="2" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="1">
+                                    <TextBlock FontWeight="SemiBold" Text="Настройте архив"/>
+                                    <TextBlock Classes="caption" Text="Куда и что копировать" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Background="{DynamicResource SuccessSoft}" CornerRadius="12" Padding="10,8">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border Grid.Column="0" Classes="wizardStepNumber" Width="34" Height="34" CornerRadius="17"
+                                        Background="{DynamicResource SuccessSoft}"
+                                        BorderBrush="{DynamicResource SuccessBrush}">
+                                    <TextBlock Text="3" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="1">
+                                    <TextBlock FontWeight="SemiBold" Text="Проверьте план"/>
+                                    <TextBlock Classes="caption" Text="И только затем запустите" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Шаг 1 -->
+                <Border Classes="card" Padding="22">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Grid.Column="0" Classes="wizardStepNumber">
+                            <TextBlock Text="1" FontSize="17" FontWeight="Bold"
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="15">
+                            <StackPanel Spacing="3">
+                                <TextBlock Classes="h2" Text="{x:Static loc:Strings.ConsolidationSources}"/>
+                                <TextBlock Classes="bodyLarge muted"
+                                           Text="Отметьте диски, из которых нужно собрать по одной лучшей копии."
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <ProgressBar IsIndeterminate="True" Width="140" HorizontalAlignment="Left"
+                                             IsVisible="{Binding IsLoadingSources}"
+                                             AutomationProperties.Name="Загружаю список дисков"/>
+                                <Button Grid.Column="1" Classes="tonal" Content="Повторить"
+                                        Command="{Binding LoadVolumesCommand}" IsEnabled="{Binding !IsLoadingSources}"
+                                        IsVisible="{Binding SourceLoadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            </Grid>
+
+                            <Border Classes="cardFlat" Padding="14,10" Background="{DynamicResource DangerSoft}"
+                                    BorderBrush="{DynamicResource DangerBrush}"
+                                    IsVisible="{Binding SourceLoadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="{Binding SourceLoadError}" TextWrapping="Wrap"
+                                           AutomationProperties.LiveSetting="Assertive"/>
+                            </Border>
+
+                            <Border Classes="cardFlat" Padding="6">
+                                <ItemsControl ItemsSource="{Binding Sources}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Classes="wizardSource">
+                                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                          MinHeight="50" Padding="10,7"
+                                                          HorizontalAlignment="Stretch"
+                                                          HorizontalContentAlignment="Stretch">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Border Grid.Column="0" Classes="iconTile" Width="38" Height="38"
+                                                                CornerRadius="11">
+                                                            <PathIcon Data="{StaticResource IconHdd}" Width="18" Height="18"
+                                                                      Foreground="{DynamicResource AccentBrush}"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" Margin="11,0,10,0" Spacing="2"
+                                                                    VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="{Binding StatusText}" Classes="caption"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Column="2" Classes="badge" Background="{DynamicResource SurfaceAlt}"
+                                                                VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding IndexedText}"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </CheckBox>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Шаг 2 -->
+                <Border Classes="card" Padding="22">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Grid.Column="0" Classes="wizardStepNumber">
+                            <TextBlock Text="2" FontSize="17" FontWeight="Bold"
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="17">
+                            <StackPanel Spacing="3">
+                                <TextBlock Classes="h2" Text="Настройте новый архив"/>
+                                <TextBlock Classes="bodyLarge muted"
+                                           Text="Укажите папку и простое правило выбора. Сначала программа построит только план."
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <StackPanel Spacing="7">
+                                <TextBlock Text="{x:Static loc:Strings.ConsolidationTarget}" FontWeight="SemiBold"/>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding TargetPath, Mode=TwoWay}"
+                                             Watermark="D:\Архив"
+                                             ToolTip.Tip="Папка, куда будет собран новый архив"/>
+                                    <Button Grid.Column="1" Classes="tonal" Margin="9,0,0,0"
+                                            Command="{Binding BrowseCommand}"
+                                            ToolTip.Tip="Выбрать папку, куда будет собран чистый архив"
+                                            AutomationProperties.Name="Выбрать папку нового архива">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconFolder}" Width="17" Height="17"/>
+                                            <TextBlock Text="{x:Static loc:Strings.Browse}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,*">
+                                <StackPanel Grid.Column="0" Spacing="7" Margin="0,0,8,0">
+                                    <TextBlock Text="{x:Static loc:Strings.ConsolidationRule}" FontWeight="SemiBold"/>
+                                    <ComboBox ItemsSource="{Binding Rules}"
+                                              SelectedItem="{Binding SelectedRule, Mode=TwoWay}"
+                                              ToolTip.Tip="Как выбрать одну копию, если файлов несколько">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Label}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                                <Border Grid.Column="1" Classes="cardFlat" Padding="14" Margin="8,0,0,0">
+                                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                                        <CheckBox IsChecked="{Binding PreserveStructure, Mode=TwoWay}"
+                                                  ToolTip.Tip="Оставить привычные папки внутри нового архива"
+                                                  Content="{x:Static loc:Strings.PreserveStructure}"/>
+                                        <CheckBox IsChecked="{Binding CollapseSimilarPhotos, Mode=TwoWay}"
+                                                  ToolTip.Tip="Из нескольких почти неразличимых кадров в архив поедет один — самый чёткий. Исходные файлы на дисках не удаляются."
+                                                  Content="{x:Static loc:Strings.CollapseSimilarPhotos}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <Border Background="{DynamicResource AccentSoft}" CornerRadius="14" Padding="15">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18"
+                                            Background="{DynamicResource SurfaceRaised}">
+                                        <PathIcon Data="{StaticResource IconCheckCircle}" Width="19" Height="19"
+                                                  Foreground="{DynamicResource AccentBrush}"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Margin="11,0,16,0" Spacing="2"
+                                                VerticalAlignment="Center">
+                                        <TextBlock FontWeight="SemiBold" Text="Сначала только безопасный предпросмотр"/>
+                                        <TextBlock Classes="caption"
+                                                   Text="Построение плана ничего не копирует и не меняет на исходных дисках."
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="2" Classes="primary" Command="{Binding BuildPlanCommand}"
+                                            ToolTip.Tip="Посчитать, что будет скопировано. Файлы пока не меняются."
+                                            AutomationProperties.Name="Построить безопасный план архива">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconLayers}" Width="17" Height="17"/>
+                                            <TextBlock Text="{x:Static loc:Strings.BuildPlan}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Шаг 3 появляется только после успешного расчёта. -->
+                <Border Classes="card" Padding="22" IsVisible="{Binding HasPlan}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Grid.Column="0" Classes="wizardStepNumber"
+                                Background="{DynamicResource SuccessSoft}"
+                                BorderBrush="{DynamicResource SuccessBrush}">
+                            <PathIcon Data="{StaticResource IconCheck}" Width="20" Height="20"
+                                      Foreground="{DynamicResource SuccessBrush}"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="16">
+                            <StackPanel Spacing="3">
+                                <TextBlock Classes="h2" Text="Проверьте готовый план"/>
+                                <TextBlock Classes="bodyLarge muted"
+                                           Text="Копирование начнётся только после вашего подтверждения. Исходные файлы останутся на месте."
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
+                                <Border Grid.Row="0" Grid.Column="0" Classes="wizardMetric" Margin="0,0,6,6">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="caption" Text="{x:Static loc:Strings.PlanUnique}"/>
+                                        <TextBlock FontSize="24" FontWeight="SemiBold" Text="{Binding UniqueText}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="0" Grid.Column="1" Classes="wizardMetric" Margin="6,0,6,6">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="caption" Text="{x:Static loc:Strings.PlanSkipped}"/>
+                                        <TextBlock FontSize="24" FontWeight="SemiBold" Text="{Binding SkippedText}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="0" Grid.Column="2" Classes="wizardMetric" Margin="6,0,0,6">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="caption" Text="{x:Static loc:Strings.PlanCollapsed}"/>
+                                        <TextBlock FontSize="24" FontWeight="SemiBold" Text="{Binding CollapsedText}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Classes="wizardMetric"
+                                        Margin="0,6,6,0">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="caption" Text="{x:Static loc:Strings.PlanBytesCopy}"/>
+                                        <TextBlock FontSize="24" FontWeight="SemiBold" Text="{Binding BytesCopyText}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="1" Grid.Column="2" Classes="wizardMetric" Margin="6,6,0,0"
+                                        Background="{DynamicResource SuccessSoft}">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="caption" Text="{x:Static loc:Strings.PlanBytesSaved}"/>
+                                        <TextBlock FontSize="24" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SuccessBrush}"
+                                                   Text="{Binding BytesSavedText}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <Border Classes="cardFlat" Padding="0" MaxHeight="300" ClipToBounds="True">
+                                <Grid RowDefinitions="Auto,*">
+                                    <Grid Grid.Row="0" ColumnDefinitions="96,*,*,92" Margin="14,10,14,7">
+                                        <TextBlock Grid.Column="0" Classes="caption" Text="Действие" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Column="1" Classes="caption" Text="Файл" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Column="2" Classes="caption" Text="Источник" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Column="3" Classes="caption" Text="Размер" FontWeight="SemiBold"/>
+                                    </Grid>
+                                    <ScrollViewer Grid.Row="1">
+                                        <ItemsControl ItemsSource="{Binding Preview}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnDefinitions="96,*,*,92" Margin="14,6">
+                                                        <Border Classes="badge" Grid.Column="0" VerticalAlignment="Center"
+                                                                Margin="0,0,10,0" Background="{DynamicResource SurfaceRaised}"
+                                                                BorderBrush="{DynamicResource SurfaceBorder}" BorderThickness="1">
+                                                            <TextBlock Text="{Binding ActionText}"/>
+                                                        </Border>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="0,0,12,0"
+                                                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding Source}" Margin="0,0,12,0"
+                                                                   Classes="caption" TextTrimming="CharacterEllipsis"
+                                                                   VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="3" Text="{Binding SizeText}" Classes="caption"
+                                                                   VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock FontWeight="SemiBold" Text="Готовы создать новый архив?"/>
+                                    <TextBlock Classes="caption" Text="Можно остановить копирование; исходные файлы не удаляются."/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                    <Button Classes="danger" Command="{Binding CancelExecuteCommand}"
+                                            IsVisible="{Binding IsExecuting}"
+                                            ToolTip.Tip="Остановить копирование">
+                                        <TextBlock Text="{x:Static loc:Strings.Cancel}"/>
+                                    </Button>
+                                    <Button Classes="primary" Command="{Binding ExecuteCommand}"
+                                            IsEnabled="{Binding !IsExecuting}"
+                                            ToolTip.Tip="Начать копирование по построенному плану. Исходные диски не изменяются."
+                                            AutomationProperties.Name="Начать создание чистого архива">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconArchive}" Width="17" Height="17"/>
+                                            <TextBlock Text="{x:Static loc:Strings.ExecutePlan}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Classes="cardFlat" Padding="14" IsVisible="{Binding IsExecuting}">
+                                <StackPanel Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock FontWeight="SemiBold" Text="Создаём архив"/>
+                                        <TextBlock Grid.Column="1" Classes="caption" Text="{Binding ExecProgress, StringFormat={}{0:F0}%}"/>
+                                    </Grid>
+                                    <ProgressBar Value="{Binding ExecProgress}" Maximum="100"/>
+                                    <TextBlock Text="{Binding ExecCurrent}" Classes="caption"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Валидация, итог и ошибки видимы независимо от готовности плана. -->
+                <Border Classes="cardFlat" Padding="14"
+                        IsVisible="{Binding ReportText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="iconTile" Width="40" Height="40" CornerRadius="12">
+                            <PathIcon Data="{StaticResource IconCheckCircle}" Width="19" Height="19"
+                                      Foreground="{DynamicResource AccentBrush}"/>
+                        </Border>
+                        <TextBlock Grid.Column="1" Text="{Binding ReportText}" Margin="12,0,0,0"
+                                   VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

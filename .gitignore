@@ -1,0 +1,71 @@
+## Build output
+bin/
+obj/
+dist/
+artifacts/
+publish/
+*.user
+*.suo
+*.userprefs
+*.rsuser
+*.DotSettings.user
+*.binlog
+*.nupkg
+
+## Test results / coverage
+[Tt]est[Rr]esults/
+*.trx
+*.coverage
+coverage*.xml
+
+## IDE
+.idea/
+.vs/
+.vscode/
+
+## Optional external binary (drop it in, see tools/README.txt)
+tools/fpcalc.exe
+
+## App runtime data (created under %LOCALAPPDATA%, never in repo)
+*.db
+*.db-wal
+*.db-shm
+*.log
+.dedupindex
+
+## Scratch / manual test corpora
+scratchpad/
+
+## OS files
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## Local assistant/editor tooling
+.claude/
+CLAUDE.md
+AGENTS.md
+.agents/
+.codex/
+.codex_manual/
+.cursor/
+.cursorrules
+.cursorignore
+.kiro/
+.github/copilot-instructions.md
+.windsurf/
+.windsurfrules
+.aider*
+.gemini/
+GEMINI.md
+.roo/
+.roomodes
+.clinerules
+.specstory/
+memory-bank/
+.serena/
+.mcp.json
+mcp.json

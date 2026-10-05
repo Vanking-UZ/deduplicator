@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Deduplicator.App.Controls.AnimatedLogo"
+             Width="{Binding $self.Size}" Height="{Binding $self.Size}"
+             IsHitTestVisible="False">
+
+    <!-- Фирменный анимированный логотип. Композиция повторяет IconLogo —
+         «стопка квадратов» (дубликаты). Слои и анимации (запускает code-behind):
+           GlowLayer  — мягкое свечение (пульс Opacity, «тень» без анимации BoxShadow);
+           BackLayer  — нижний квадрат, лёгкий противофазный 3D-наклон;
+           середина   — полупрозрачный статичный квадрат (глубина стопки);
+           FrontLayer — верхний квадрат с AccentGradient, полное вращение по Y (Rotate3D).
+         Дизайн-холст 100×100 в Viewbox: параметр Size масштабирует всё пропорционально. -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <RadialGradientBrush x:Key="LogoGlowBrush">
+                        <GradientStop Offset="0" Color="#665865F2" />
+                        <GradientStop Offset="0.7" Color="#245865F2" />
+                        <GradientStop Offset="1" Color="#005865F2" />
+                    </RadialGradientBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <RadialGradientBrush x:Key="LogoGlowBrush">
+                        <GradientStop Offset="0" Color="#70818CFF" />
+                        <GradientStop Offset="0.7" Color="#2B818CFF" />
+                        <GradientStop Offset="1" Color="#00818CFF" />
+                    </RadialGradientBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Viewbox Stretch="Uniform">
+        <Grid Width="100" Height="100">
+            <Grid x:Name="PulseRoot">
+                <Border x:Name="GlowLayer" Width="96" Height="96" CornerRadius="48" Opacity="0.7"
+                        Background="{DynamicResource LogoGlowBrush}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Border x:Name="BackLayer" Width="52" Height="52" CornerRadius="13" Opacity="0.9"
+                        Background="{DynamicResource AccentSoft}"
+                        BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2"
+                        BoxShadow="0 8 20 0 #24000000"
+                        HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="11,0,0,11" />
+                <Border Width="52" Height="52" CornerRadius="13" Opacity="0.45"
+                        Background="{DynamicResource AccentBrush}"
+                        BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Border x:Name="FrontLayer" Width="52" Height="52" CornerRadius="13"
+                        Background="{DynamicResource AccentGradient}"
+                        BorderBrush="#38FFFFFF" BorderThickness="1"
+                        BoxShadow="0 10 24 0 #30000000"
+                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,11,11,0">
+                    <PathIcon Data="{StaticResource IconLogo}" Width="24" Height="24"
+                              Foreground="White" Opacity="0.95" />
+                </Border>
+            </Grid>
+        </Grid>
+    </Viewbox>
+</UserControl>

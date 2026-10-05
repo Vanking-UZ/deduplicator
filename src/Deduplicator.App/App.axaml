@@ -1,0 +1,497 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Deduplicator.App"
+             x:Class="Deduplicator.App.App"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <!-- ===== Светлая продуктовая тема ===== -->
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppBackground" Color="#F4F6FB" />
+                    <SolidColorBrush x:Key="SurfaceBackground" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SurfaceRaised" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SurfaceAlt" Color="#EEF2F8" />
+                    <SolidColorBrush x:Key="SurfaceStrong" Color="#E4EAF3" />
+                    <SolidColorBrush x:Key="SurfaceBorder" Color="#DCE3ED" />
+                    <SolidColorBrush x:Key="TextPrimary" Color="#151B28" />
+                    <SolidColorBrush x:Key="TextSecondary" Color="#5E697A" />
+                    <SolidColorBrush x:Key="TextTertiary" Color="#8792A3" />
+                    <SolidColorBrush x:Key="AccentBrush" Color="#4854D6" />
+                    <SolidColorBrush x:Key="AccentSoft" Color="#ECEEFF" />
+                    <SolidColorBrush x:Key="AccentForeground" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SidebarBackground" Color="#101624" />
+                    <SolidColorBrush x:Key="SidebarSurface" Color="#171F31" />
+                    <SolidColorBrush x:Key="SidebarText" Color="#F7F9FC" />
+                    <SolidColorBrush x:Key="SidebarTextMuted" Color="#9EA9BC" />
+                    <SolidColorBrush x:Key="SidebarHover" Color="#1B263C" />
+                    <SolidColorBrush x:Key="SidebarSelected" Color="#273454" />
+                    <SolidColorBrush x:Key="SidebarAccent" Color="#91A0FF" />
+                    <SolidColorBrush x:Key="HoverBackground" Color="#E9EEF6" />
+                    <SolidColorBrush x:Key="SelectedBackground" Color="#ECEEFF" />
+                    <SolidColorBrush x:Key="CardBorder" Color="#E1E7F0" />
+                    <BoxShadows x:Key="CardShadow">0 1 2 0 #100F172A, 0 10 32 0 #0A0F172A</BoxShadows>
+                    <BoxShadows x:Key="ElevatedShadow">0 2 6 0 #140F172A, 0 18 48 0 #120F172A</BoxShadows>
+                    <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#5662DD" />
+                        <GradientStop Offset="1" Color="#3F49BD" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="AccentGradientHover" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#5C67DC" />
+                        <GradientStop Offset="1" Color="#4B55CC" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="HeroGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#17233B" />
+                        <GradientStop Offset="0.58" Color="#293A68" />
+                        <GradientStop Offset="1" Color="#5352C8" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#4854D6" />
+                    <SolidColorBrush x:Key="DangerBrush" Color="#C9363E" />
+                    <SolidColorBrush x:Key="DangerForeground" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SuccessBrush" Color="#087A5A" />
+                    <SolidColorBrush x:Key="WarningBrush" Color="#A65A00" />
+                    <!-- Мягкие статусные подложки (баннеры/плашки) и фиолетовый
+                         акцент («Архив дисков», категория «Документы») — раньше хардкоды в вьюхах. -->
+                    <SolidColorBrush x:Key="DangerSoft" Color="#FFF0F0" />
+                    <SolidColorBrush x:Key="WarningSoft" Color="#FFF6E8" />
+                    <SolidColorBrush x:Key="SuccessSoft" Color="#EAF8F2" />
+                    <SolidColorBrush x:Key="IndigoBrush" Color="#4854D6" />
+                    <SolidColorBrush x:Key="IndigoSoft" Color="#ECEEFF" />
+                    <SolidColorBrush x:Key="PurpleBrush" Color="#8B5CF6" />
+                    <!-- Затемнения диалогов/просмотрщика: полупрозрачный чёрный уместен в обеих
+                         темах, но живёт в ресурсах для единообразия (и №7: подложка сайдбара). -->
+                    <SolidColorBrush x:Key="OverlayDim" Color="#80000000" />
+                    <SolidColorBrush x:Key="OverlayDimLight" Color="#33000000" />
+                    <SolidColorBrush x:Key="OverlayDimStrong" Color="#E6000000" />
+                </ResourceDictionary>
+                <!-- ===== Тёмная продуктовая тема ===== -->
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppBackground" Color="#0E131B" />
+                    <SolidColorBrush x:Key="SurfaceBackground" Color="#171E28" />
+                    <SolidColorBrush x:Key="SurfaceRaised" Color="#1C2531" />
+                    <SolidColorBrush x:Key="SurfaceAlt" Color="#202A37" />
+                    <SolidColorBrush x:Key="SurfaceStrong" Color="#293646" />
+                    <SolidColorBrush x:Key="SurfaceBorder" Color="#2A3646" />
+                    <SolidColorBrush x:Key="TextPrimary" Color="#F5F7FB" />
+                    <SolidColorBrush x:Key="TextSecondary" Color="#AAB5C5" />
+                    <SolidColorBrush x:Key="TextTertiary" Color="#788598" />
+                    <SolidColorBrush x:Key="AccentBrush" Color="#AAB1FF" />
+                    <SolidColorBrush x:Key="AccentSoft" Color="#252B50" />
+                    <SolidColorBrush x:Key="AccentForeground" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SidebarBackground" Color="#090E15" />
+                    <SolidColorBrush x:Key="SidebarSurface" Color="#121A26" />
+                    <SolidColorBrush x:Key="SidebarText" Color="#F7F9FC" />
+                    <SolidColorBrush x:Key="SidebarTextMuted" Color="#8F9CAF" />
+                    <SolidColorBrush x:Key="SidebarHover" Color="#182233" />
+                    <SolidColorBrush x:Key="SidebarSelected" Color="#222D4A" />
+                    <SolidColorBrush x:Key="SidebarAccent" Color="#9BA6FF" />
+                    <SolidColorBrush x:Key="HoverBackground" Color="#253140" />
+                    <SolidColorBrush x:Key="SelectedBackground" Color="#272E58" />
+                    <SolidColorBrush x:Key="CardBorder" Color="#2A3646" />
+                    <BoxShadows x:Key="CardShadow">0 1 2 0 #30000000, 0 12 32 0 #18000000</BoxShadows>
+                    <BoxShadows x:Key="ElevatedShadow">0 4 12 0 #3D000000, 0 22 56 0 #26000000</BoxShadows>
+                    <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#5B66DE" />
+                        <GradientStop Offset="1" Color="#444DBB" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="AccentGradientHover" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#5D68D8" />
+                        <GradientStop Offset="1" Color="#505ACA" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="HeroGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#171F34" />
+                        <GradientStop Offset="0.6" Color="#252C58" />
+                        <GradientStop Offset="1" Color="#494AA7" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#AAB1FF" />
+                    <SolidColorBrush x:Key="DangerBrush" Color="#FF7D83" />
+                    <SolidColorBrush x:Key="DangerForeground" Color="#211016" />
+                    <SolidColorBrush x:Key="SuccessBrush" Color="#45C99A" />
+                    <SolidColorBrush x:Key="WarningBrush" Color="#F6AD55" />
+                    <!-- Тёмные приглушённые версии мягких подложек -->
+                    <SolidColorBrush x:Key="DangerSoft" Color="#3A2329" />
+                    <SolidColorBrush x:Key="WarningSoft" Color="#3B3020" />
+                    <SolidColorBrush x:Key="SuccessSoft" Color="#193A32" />
+                    <SolidColorBrush x:Key="IndigoBrush" Color="#949DFF" />
+                    <SolidColorBrush x:Key="IndigoSoft" Color="#272E58" />
+                    <SolidColorBrush x:Key="PurpleBrush" Color="#B58BFF" />
+                    <SolidColorBrush x:Key="OverlayDim" Color="#80000000" />
+                    <SolidColorBrush x:Key="OverlayDimLight" Color="#33000000" />
+                    <SolidColorBrush x:Key="OverlayDimStrong" Color="#E6000000" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <!-- ===== Иконки (SVG path data, 24×24), без эмодзи ===== -->
+            <StreamGeometry x:Key="IconLogo">M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z</StreamGeometry>
+            <StreamGeometry x:Key="IconHdd">M6,2H18A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2M12,4A6,6 0 0,0 6,10A6,6 0 0,0 12,16A6,6 0 0,0 18,10A6,6 0 0,0 12,4M12,6A4,4 0 0,1 16,10A4,4 0 0,1 12,14A4,4 0 0,1 8,10A4,4 0 0,1 12,6M12,9A1,1 0 0,0 11,10A1,1 0 0,0 12,11A1,1 0 0,0 13,10A1,1 0 0,0 12,9Z</StreamGeometry>
+            <StreamGeometry x:Key="IconFolder">M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z</StreamGeometry>
+            <StreamGeometry x:Key="IconSearch">M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z</StreamGeometry>
+            <StreamGeometry x:Key="IconLayers">M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27M12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z</StreamGeometry>
+            <StreamGeometry x:Key="IconChart">M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z</StreamGeometry>
+            <StreamGeometry x:Key="IconArchive">M3,3H21V7H3V3M4,8H20V21H4V8M9.5,11A0.5,0.5 0 0,0 9,11.5V13H15V11.5A0.5,0.5 0 0,0 14.5,11H9.5Z</StreamGeometry>
+            <StreamGeometry x:Key="IconHistory">M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z</StreamGeometry>
+            <StreamGeometry x:Key="IconSettings">M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z</StreamGeometry>
+            <StreamGeometry x:Key="IconTrash">M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z</StreamGeometry>
+            <StreamGeometry x:Key="IconRestore">M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3M12,8V13L16.28,15.54L17,14.33L13.5,12.25V8H12Z</StreamGeometry>
+            <StreamGeometry x:Key="IconPlay">M8,5.14V19.14L19,12.14L8,5.14Z</StreamGeometry>
+            <StreamGeometry x:Key="IconPause">M14,19H18V5H14M6,19H10V5H6V19Z</StreamGeometry>
+            <StreamGeometry x:Key="IconStar">M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z</StreamGeometry>
+            <StreamGeometry x:Key="IconCheck">M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z</StreamGeometry>
+            <StreamGeometry x:Key="IconCheckCircle">M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.91,10.59L6.5,12L11,16.5Z</StreamGeometry>
+            <StreamGeometry x:Key="IconImage">M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z</StreamGeometry>
+            <StreamGeometry x:Key="IconMusic">M12,3V12.26C11.5,12.09 11,12 10.5,12C8,12 6,13.79 6,16C6,18.21 8,20 10.5,20C13,20 15,18.21 15,16V6H19V3H12Z</StreamGeometry>
+            <StreamGeometry x:Key="IconVideo">M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z</StreamGeometry>
+            <StreamGeometry x:Key="IconDocument">M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z</StreamGeometry>
+            <StreamGeometry x:Key="IconFile">M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z</StreamGeometry>
+            <StreamGeometry x:Key="IconRefresh">M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z</StreamGeometry>
+            <StreamGeometry x:Key="IconChevronRight">M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z</StreamGeometry>
+            <StreamGeometry x:Key="IconChevronLeft">M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z</StreamGeometry>
+            <StreamGeometry x:Key="IconChevronDown">M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z</StreamGeometry>
+            <StreamGeometry x:Key="IconWarning">M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z</StreamGeometry>
+            <StreamGeometry x:Key="IconPlug">M16,7V3H14V7H10V3H8V7C7,7 6,8 6,9V14.5L9.5,18V21H14.5V18L18,14.5V9C18,8 17,7 16,7Z</StreamGeometry>
+            <StreamGeometry x:Key="IconClose">M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z</StreamGeometry>
+            <StreamGeometry x:Key="IconHealth">M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z</StreamGeometry>
+            <StreamGeometry x:Key="IconPanels">M3,3H21A2,2 0 0,1 23,5V19A2,2 0 0,1 21,21H3A2,2 0 0,1 1,19V5A2,2 0 0,1 3,3M13,5V19H21V5H13M3,5V19H11V5H3Z</StreamGeometry>
+            <StreamGeometry x:Key="IconCopy">M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z</StreamGeometry>
+            <StreamGeometry x:Key="IconMove">M15,9H5V5H15M12,19L8,15H11V11H13V15H16M17,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z</StreamGeometry>
+            <StreamGeometry x:Key="IconRename">M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z</StreamGeometry>
+            <StreamGeometry x:Key="IconFolderPlus">M13,19C13,19.34 13.04,19.67 13.09,20H4C2.9,20 2,19.11 2,18V6C2,4.89 2.9,4 4,4H10L12,6H20A2,2 0 0,1 22,8V13.81C21.12,13.3 20.1,13 19,13C15.69,13 13,15.69 13,19M20,18V15H18V18H15V20H18V23H20V20H23V18H20Z</StreamGeometry>
+            <StreamGeometry x:Key="IconUp">M14,20H10V11L6.5,14.5L4.08,12.08L12,4.16L19.92,12.08L17.5,14.5L14,11V20Z</StreamGeometry>
+            <StreamGeometry x:Key="IconBroom">M19.36,2.72L20.78,4.14L15.06,9.85C16.13,11.39 16.28,13.24 15.38,14.44L9.06,8.12C10.26,7.22 12.11,7.37 13.65,8.44L19.36,2.72M5.93,17.57C3.92,15.56 2.69,13.16 2.35,10.92L7.23,8.83L14.67,16.27L12.58,21.15C10.34,20.81 7.94,19.58 5.93,17.57Z</StreamGeometry>
+            <StreamGeometry x:Key="IconLink">M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z</StreamGeometry>
+            <StreamGeometry x:Key="IconExport">M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,19L8,15H10.5V12H13.5V15H16L12,19Z</StreamGeometry>
+            <StreamGeometry x:Key="IconSort">M3,13H15V11H3M3,6V8H21V6M3,18H9V16H3V18Z</StreamGeometry>
+            <StreamGeometry x:Key="IconDatabase">M12,3C7.58,3 4,4.79 4,7C4,9.21 7.58,11 12,11C16.42,11 20,9.21 20,7C20,4.79 16.42,3 12,3M4,9V12C4,14.21 7.58,16 12,16C16.42,16 20,14.21 20,12V9C20,11.21 16.42,13 12,13C7.58,13 4,11.21 4,9M4,14V17C4,19.21 7.58,21 12,21C16.42,21 20,19.21 20,17V14C20,16.21 16.42,18 12,18C7.58,18 4,16.21 4,14Z</StreamGeometry>
+            <StreamGeometry x:Key="IconGrid">M3,11H11V3H3M3,21H11V13H3M13,21H21V13H13M13,3V11H21V3</StreamGeometry>
+            <StreamGeometry x:Key="IconList">M3,5H21V7H3V5M3,11H21V13H3V11M3,17H21V19H3V17Z</StreamGeometry>
+            <StreamGeometry x:Key="IconUpdate">M21,10.12H14.22L16.96,7.3C14.23,4.6 9.81,4.5 7.08,7.2C4.35,9.91 4.35,14.28 7.08,17C9.81,19.7 14.23,19.7 16.96,17C18.32,15.65 19,14.08 19,12.1H21C21,14.08 20.12,16.65 18.36,18.39C14.85,21.87 9.15,21.87 5.64,18.39C2.14,14.92 2.11,9.28 5.62,5.81C9.13,2.34 14.76,2.34 18.27,5.81L21,3V10.12M12.5,8V12.25L16,14.33L15.28,15.54L11,13V8H12.5Z</StreamGeometry>
+
+            <!-- Единая геометрия продукта. -->
+            <CornerRadius x:Key="CardRadius">18</CornerRadius>
+            <CornerRadius x:Key="HeroRadius">24</CornerRadius>
+            <CornerRadius x:Key="ButtonRadius">12</CornerRadius>
+            <CornerRadius x:Key="InputRadius">12</CornerRadius>
+            <CornerRadius x:Key="BadgeRadius">999</CornerRadius>
+            <Thickness x:Key="PagePadding">32,28,32,32</Thickness>
+            <!-- Масштабируемые токены основной типографики. Значения обновляет App.ApplyUiPreferences. -->
+            <x:Double x:Key="UiBodyFontSize">15</x:Double>
+            <x:Double x:Key="UiH1FontSize">30</x:Double>
+            <x:Double x:Key="UiH2FontSize">20</x:Double>
+            <x:Double x:Key="UiDisplayFontSize">34</x:Double>
+            <x:Double x:Key="UiDisplayLineHeight">40</x:Double>
+            <x:Double x:Key="UiSectionFontSize">18</x:Double>
+            <x:Double x:Key="UiEyebrowFontSize">11</x:Double>
+            <x:Double x:Key="UiBodyLargeFontSize">16</x:Double>
+            <x:Double x:Key="UiBodyLineHeight">24</x:Double>
+            <x:Double x:Key="UiCaptionFontSize">13.5</x:Double>
+            <x:Double x:Key="UiControlMinHeight">44</x:Double>
+            <x:Double x:Key="UiCheckMinHeight">40</x:Double>
+            <x:Double x:Key="UiInputFontSize">15</x:Double>
+            <Thickness x:Key="UiButtonPadding">16,9</Thickness>
+            <!-- Fluent: толщина рамки инпута в фокусе (цвет — в темах выше) -->
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">2</Thickness>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- ===== Базовая типографика ===== -->
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+            <Setter Property="FontSize" Value="{DynamicResource UiBodyFontSize}" />
+        </Style>
+        <Style Selector="TextBlock.h1">
+            <Setter Property="FontSize" Value="{DynamicResource UiH1FontSize}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="-0.65" />
+        </Style>
+        <Style Selector="TextBlock.h2">
+            <Setter Property="FontSize" Value="{DynamicResource UiH2FontSize}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="-0.3" />
+        </Style>
+        <Style Selector="TextBlock.display">
+            <Setter Property="FontSize" Value="{DynamicResource UiDisplayFontSize}" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="LetterSpacing" Value="-0.9" />
+            <Setter Property="LineHeight" Value="{DynamicResource UiDisplayLineHeight}" />
+        </Style>
+        <Style Selector="TextBlock.sectionTitle">
+            <Setter Property="FontSize" Value="{DynamicResource UiSectionFontSize}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="-0.2" />
+        </Style>
+        <Style Selector="TextBlock.eyebrow">
+            <Setter Property="FontSize" Value="{DynamicResource UiEyebrowFontSize}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="1.2" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        <Style Selector="TextBlock.bodyLarge">
+            <Setter Property="FontSize" Value="{DynamicResource UiBodyLargeFontSize}" />
+            <Setter Property="LineHeight" Value="{DynamicResource UiBodyLineHeight}" />
+        </Style>
+        <Style Selector="TextBlock.muted">
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+        </Style>
+        <Style Selector="TextBlock.caption">
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="FontSize" Value="{DynamicResource UiCaptionFontSize}" />
+        </Style>
+        <!-- Моноширинный класс для путей файлов; :is() — чтобы ловить и SelectableTextBlock -->
+        <Style Selector=":is(TextBlock).mono">
+            <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,Courier New,monospace" />
+        </Style>
+
+        <!-- ===== Карточка ===== -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaised}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource CardRadius}" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="BoxShadow" Value="{DynamicResource CardShadow}" />
+        </Style>
+        <Style Selector="Border.cardFlat">
+            <Setter Property="Background" Value="{DynamicResource SurfaceAlt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource CardRadius}" />
+            <Setter Property="Padding" Value="20" />
+        </Style>
+        <Style Selector="Border.hero">
+            <Setter Property="Background" Value="{DynamicResource HeroGradient}" />
+            <Setter Property="CornerRadius" Value="{StaticResource HeroRadius}" />
+            <Setter Property="Padding" Value="28" />
+            <Setter Property="BoxShadow" Value="{DynamicResource ElevatedShadow}" />
+        </Style>
+        <Style Selector="Border.iconTile">
+            <Setter Property="Width" Value="46" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+        </Style>
+
+        <!-- Компактная, но хорошо читаемая строка преимущества на welcome-экране. -->
+        <Style Selector="Border.onboardingBenefit">
+            <Setter Property="Background" Value="{DynamicResource SurfaceAlt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="12,10" />
+        </Style>
+
+        <!-- ===== Бейдж/чип: единый радиус и внутренние отступы ===== -->
+        <Style Selector="Border.badge">
+            <Setter Property="CornerRadius" Value="{StaticResource BadgeRadius}" />
+            <Setter Property="Padding" Value="8,3" />
+        </Style>
+        <Style Selector="Border.badge TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- ===== Строка списка: прозрачная, ховер со скруглением 8 ===== -->
+        <Style Selector="Border.row">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.12" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.row:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBackground}" />
+        </Style>
+
+        <!-- ===== Кнопки ===== -->
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="{StaticResource ButtonRadius}" />
+            <Setter Property="Padding" Value="{DynamicResource UiButtonPadding}" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="{DynamicResource UiBodyFontSize}" />
+            <Setter Property="MinHeight" Value="{DynamicResource UiControlMinHeight}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaised}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.16" />
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.985)" />
+        </Style>
+        <Style Selector="Button:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.008)" />
+        </Style>
+        <Style Selector="Button:pointerover:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.985)" />
+        </Style>
+        <!-- Reduced motion: цветовые состояния остаются, геометрическое движение отключается. -->
+        <Style Selector="Window.reduceMotion Button:pointerover">
+            <Setter Property="RenderTransform" Value="none" />
+        </Style>
+        <Style Selector="Window.reduceMotion Button:pressed">
+            <Setter Property="RenderTransform" Value="none" />
+        </Style>
+        <Style Selector="Window.reduceMotion Button.toolTile:pointerover">
+            <Setter Property="RenderTransform" Value="none" />
+        </Style>
+        <Style Selector="Window.reduceMotion Button.toolTile:pressed">
+            <Setter Property="RenderTransform" Value="none" />
+        </Style>
+        <Style Selector="Window.reduceMotion Border.fileTile:pointerover">
+            <Setter Property="RenderTransform" Value="none" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource AccentGradient}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentForeground}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="18,10" />
+            <Setter Property="MinHeight" Value="46" />
+        </Style>
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentGradientHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentForeground}" />
+        </Style>
+        <!-- Единый источник цвета контента цветных кнопок. Вложенные TextBlock/PathIcon
+             не наследуют Foreground кнопки — раньше это давало тёмный текст на синем и требовало
+             ~15 ручных Foreground="White" по вьюхам; тёмная тема ломала половину из них. -->
+        <Style Selector="Button.primary TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource AccentForeground}" />
+        </Style>
+        <Style Selector="Button.primary PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource AccentForeground}" />
+        </Style>
+        <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentGradient}" />
+        </Style>
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource DangerForeground}" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.danger TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource DangerForeground}" />
+        </Style>
+        <Style Selector="Button.danger PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource DangerForeground}" />
+        </Style>
+        <!-- «Красные» кнопки не сереют при наведении/нажатии (дефолтный Fluent перекрашивал фон) -->
+        <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        </Style>
+        <Style Selector="Button.danger:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        </Style>
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.tonal">
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.tonal TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        <Style Selector="Button.tonal PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        <Style Selector="Button.iconButton">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
+
+        <!-- ===== Иконки ===== -->
+        <Style Selector="PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+        </Style>
+
+        <!-- ===== Навигация продукта ===== -->
+        <Style Selector="ListBox.nav">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem">
+            <Setter Property="Padding" Value="13,11" />
+            <Setter Property="Margin" Value="10,2" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource SidebarTextMuted}" />
+            <Setter Property="MinHeight" Value="46" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SidebarHover}" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SidebarSelected}" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource SidebarAccent}" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource SidebarText}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:not(:selected) PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource SidebarTextMuted}" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:not(:selected) TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource SidebarTextMuted}" />
+        </Style>
+
+        <!-- ===== Инпуты: радиус 10, комфортная высота; фокус — 2px акцентная рамка
+             (через переопределение Fluent-ресурсов TextControlBorder* выше) ===== -->
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="{StaticResource InputRadius}" />
+            <Setter Property="MinHeight" Value="{DynamicResource UiControlMinHeight}" />
+            <Setter Property="FontSize" Value="{DynamicResource UiInputFontSize}" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="CornerRadius" Value="{StaticResource InputRadius}" />
+            <Setter Property="MinHeight" Value="{DynamicResource UiControlMinHeight}" />
+            <Setter Property="FontSize" Value="{DynamicResource UiInputFontSize}" />
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="CornerRadius" Value="{StaticResource InputRadius}" />
+            <Setter Property="MinHeight" Value="{DynamicResource UiControlMinHeight}" />
+            <Setter Property="FontSize" Value="{DynamicResource UiInputFontSize}" />
+        </Style>
+        <Style Selector="CheckBox">
+            <Setter Property="MinHeight" Value="{DynamicResource UiCheckMinHeight}" />
+            <Setter Property="FontSize" Value="{DynamicResource UiInputFontSize}" />
+        </Style>
+
+        <!-- ===== Вкладки: компактнее гигантского pivot-заголовка Fluent ===== -->
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- ===== Прогресс ===== -->
+        <Style Selector="ProgressBar">
+            <Setter Property="Foreground" Value="{DynamicResource AccentGradient}" />
+            <Setter Property="MinHeight" Value="8" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+    </Application.Styles>
+</Application>

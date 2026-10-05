@@ -1,0 +1,517 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Deduplicator.App.Localization"
+             xmlns:conv="clr-namespace:Deduplicator.App.Converters"
+             xmlns:controls="clr-namespace:Deduplicator.App.Controls"
+             x:Class="Deduplicator.App.Views.ExplorerView">
+
+    <UserControl.Styles>
+        <!-- Кнопки переключения вида: активная подсвечивается акцентом. -->
+        <Style Selector="Button.viewswitch">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaised}"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="MinWidth" Value="44"/>
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="CornerRadius" Value="11"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Button.viewswitch.active">
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+        </Style>
+        <Style Selector="Button.viewswitch.active PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+        </Style>
+        <!-- Хлебные крошки. -->
+        <Style Selector="Button.crumb">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="9,6"/>
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="MinHeight" Value="36"/>
+        </Style>
+        <!-- Заголовки колонок списка (сортировка кликом). -->
+        <Style Selector="Button.colhdr">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="5,4"/>
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <!-- Плитки вида «значки». -->
+        <Style Selector="ListBox.tiles ListBoxItem">
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style Selector="ListBox.tiles ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+        </Style>
+        <!-- Строки вида «список» (строки выше, скругление 8). -->
+        <Style Selector="ListBox.rows ListBoxItem">
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="MinHeight" Value="46"/>
+            <Setter Property="CornerRadius" Value="11"/>
+        </Style>
+        <Style Selector="ListBox.rows ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+        </Style>
+        <!-- Строки колонок вида «столбцы». -->
+        <Style Selector="ListBox.millercol ListBoxItem">
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+        <Style Selector="ListBox.millercol ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+        </Style>
+        <Style Selector="Border.explorerNotice">
+            <Setter Property="CornerRadius" Value="11"/>
+            <Setter Property="Padding" Value="12,9"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Panel>
+        <Grid RowDefinitions="Auto,Auto,*" Margin="{StaticResource PagePadding}"
+              IsEnabled="{Binding IsInteractionEnabled}">
+            <StackPanel Grid.Row="0" Margin="0,0,0,18" Spacing="5">
+                <TextBlock Classes="eyebrow" Text="СОХРАНЁННЫЕ ФАЙЛЫ"/>
+                <TextBlock Classes="h1" Text="{x:Static loc:Strings.ExplorerTitle}"/>
+                <TextBlock Classes="muted bodyLarge" Text="{x:Static loc:Strings.ExplorerHint}"/>
+            </StackPanel>
+
+            <Border Grid.Row="1" Classes="cardFlat" Padding="16" Margin="0,0,0,16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Grid.Column="0" Classes="iconTile" Width="46" Height="46" VerticalAlignment="Center">
+                        <PathIcon Data="{StaticResource IconHdd}" Width="22" Height="22"
+                                  Foreground="{DynamicResource AccentBrush}"/>
+                    </Border>
+                    <Grid Grid.Column="1" RowDefinitions="Auto,Auto" Margin="14,0,16,0">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="9" Margin="0,0,0,5">
+                            <TextBlock Classes="sectionTitle" Text="Где смотреть файлы"/>
+                            <Border Classes="badge" VerticalAlignment="Center" Background="{DynamicResource AccentSoft}"
+                                    IsVisible="{Binding SourceHint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="{Binding SourceHint}" Foreground="{DynamicResource AccentBrush}"/>
+                            </Border>
+                        </StackPanel>
+                        <ComboBox Grid.Row="1" MinWidth="220" MaxWidth="520" HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center" ItemsSource="{Binding Volumes}"
+                                  IsEnabled="{Binding !IsTransferring}"
+                                  ToolTip.Tip="Выберите подключённый диск или сохранённый список отключённого диска"
+                                  SelectedItem="{Binding SelectedVolume, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <PathIcon Data="{StaticResource IconHdd}" Width="16" Height="16"/>
+                                        <TextBlock Text="{Binding DisplayName}"/>
+                                        <TextBlock Text="{Binding StatusText}" Classes="caption" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <ProgressBar IsIndeterminate="True" Width="82" IsVisible="{Binding IsBusy}"
+                                     VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="2" ColumnDefinitions="228,14,*">
+                <!-- ===== Слева: дерево навигации (как раньше) ===== -->
+                <Border Grid.Column="0" Classes="cardFlat" Padding="8">
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="8,7,8,5">
+                            <Border Classes="iconTile" Width="38" Height="38" CornerRadius="11">
+                                <PathIcon Data="{StaticResource IconFolder}" Width="18" Height="18"
+                                          Foreground="{DynamicResource AccentBrush}"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Classes="sectionTitle" Text="Папки"/>
+                                <TextBlock Classes="caption" Text="Дважды нажмите, чтобы раскрыть"/>
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Grid.Row="1" Text="{Binding Status}" Classes="muted" Margin="10,6,10,8"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        <TreeView Grid.Row="2" ItemsSource="{Binding Root}" Background="Transparent"
+                                  Margin="0,2,0,0"
+                                  DoubleTapped="OnNodeDoubleTapped"
+                                  SelectionChanged="OnTreeSelectionChanged">
+                            <TreeView.Styles>
+                                <!-- Ленивая подгрузка папок при раскрытии. -->
+                                <Style Selector="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                    <Setter Property="MinHeight" Value="42"/>
+                                    <Setter Property="CornerRadius" Value="10"/>
+                                </Style>
+                            </TreeView.Styles>
+                            <TreeView.ItemTemplate>
+                                <TreeDataTemplate ItemsSource="{Binding Children}">
+                                    <StackPanel Orientation="Horizontal" Spacing="9" Height="38">
+                                        <PathIcon Data="{Binding Icon}" Width="17" Height="17"
+                                                  Foreground="{DynamicResource TextSecondary}"/>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Grid>
+                </Border>
+
+                <!-- ===== Справа: содержимое папки в трёх видах ===== -->
+                <Border Grid.Column="2" Classes="card" Padding="0" ClipToBounds="True">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+                        <!-- Крошки + переключатель видов -->
+                        <Border Grid.Row="0" Background="{DynamicResource SurfaceAlt}" Padding="12,10"
+                                BorderBrush="{DynamicResource SurfaceBorder}" BorderThickness="0,0,0,1">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Disabled" VerticalAlignment="Center">
+                                <ItemsControl ItemsSource="{Binding Crumbs}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Classes="crumb" Content="{Binding Title}"
+                                                        Command="{Binding $parent[UserControl].DataContext.NavigateToCrumbCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                                <PathIcon Data="{StaticResource IconChevronRight}" Width="9" Height="9"
+                                                          VerticalAlignment="Center" Margin="1,0"
+                                                          Foreground="{DynamicResource TextSecondary}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                <ProgressBar IsIndeterminate="True" Width="60" Margin="0,0,10,0"
+                                             IsVisible="{Binding IsRightBusy}" VerticalAlignment="Center"/>
+                                <Button Classes="viewswitch" Classes.active="{Binding IsIconsMode}"
+                                        Command="{Binding SetViewModeCommand}" CommandParameter="icons"
+                                        ToolTip.Tip="{x:Static loc:Strings.ExplorerViewIcons}"
+                                        AutomationProperties.Name="Показать файлы крупными значками">
+                                    <PathIcon Data="{StaticResource IconGrid}" Width="15" Height="15"/>
+                                </Button>
+                                <Button Classes="viewswitch" Classes.active="{Binding IsListMode}"
+                                        Command="{Binding SetViewModeCommand}" CommandParameter="list"
+                                        ToolTip.Tip="{x:Static loc:Strings.ExplorerViewList}"
+                                        AutomationProperties.Name="Показать файлы списком">
+                                    <PathIcon Data="{StaticResource IconList}" Width="15" Height="15"/>
+                                </Button>
+                                <Button Classes="viewswitch" Classes.active="{Binding IsColumnsMode}"
+                                        Command="{Binding SetViewModeCommand}" CommandParameter="columns"
+                                        ToolTip.Tip="{x:Static loc:Strings.ExplorerViewColumns}"
+                                        AutomationProperties.Name="Показать файлы по столбцам">
+                                    <PathIcon Data="{StaticResource IconPanels}" Width="15" Height="15"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        </Border>
+
+                        <!-- Операции с выделением -->
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="12,8,12,7">
+                            <!-- Обёртка нужна, чтобы подсказка показывалась и над выключенными кнопками. -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                                        ToolTip.Tip="{Binding OperationsHint}">
+                                <Button Classes="ghost" Command="{Binding CopySelectedCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{StaticResource IconCopy}" Width="14" Height="14"/>
+                                        <TextBlock Text="{x:Static loc:Strings.ExplorerCopyTo}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="ghost" Command="{Binding MoveSelectedCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{StaticResource IconMove}" Width="14" Height="14"/>
+                                        <TextBlock Text="{x:Static loc:Strings.ExplorerMoveTo}"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            <Border Grid.Column="1" Classes="badge" Background="{DynamicResource AccentSoft}"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    IsVisible="{Binding SelectionText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="{Binding SelectionText}" Foreground="{DynamicResource AccentBrush}"/>
+                            </Border>
+                        </Grid>
+
+                        <!-- Баннеры: итог, ошибки, подсказка про проверку -->
+                        <StackPanel Grid.Row="2" Spacing="6" Margin="12,0,12,8">
+                            <Border Classes="explorerNotice" Background="{DynamicResource AccentSoft}"
+                                    IsVisible="{Binding SuccessText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource IconCheckCircle}" Width="16" Height="16"
+                                              Foreground="{DynamicResource AccentBrush}"/>
+                                    <TextBlock Text="{Binding SuccessText}" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource AccentBrush}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="explorerNotice" Background="{DynamicResource DangerSoft}"
+                                    IsVisible="{Binding OperationError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource IconWarning}" Width="16" Height="16"
+                                              Foreground="{DynamicResource DangerBrush}"/>
+                                    <TextBlock Text="{Binding OperationError}" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource DangerBrush}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="explorerNotice" Background="{DynamicResource WarningSoft}"
+                                    IsVisible="{Binding ShowRescanHint}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource IconWarning}" Width="14" Height="14"
+                                              Foreground="{DynamicResource WarningBrush}"/>
+                                    <TextBlock Text="{x:Static loc:Strings.ExplorerRescanHint}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Содержимое -->
+                        <Panel Grid.Row="3" Margin="8,0,8,8">
+                            <TextBlock Text="{Binding RightStatus}" Classes="muted" Margin="14"
+                                       IsVisible="{Binding RightStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                            <!-- Вид «крупные значки» -->
+                            <ListBox x:Name="IconsList" IsVisible="{Binding IsIconsMode}" Classes="tiles"
+                                     ItemsSource="{Binding Entries}" SelectionMode="Multiple"
+                                     SelectionChanged="OnRightSelectionChanged"
+                                     DoubleTapped="OnEntryDoubleTapped" Background="Transparent">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Width="132" Height="132" Spacing="8" Margin="2,8"
+                                                    VerticalAlignment="Top">
+                                            <Border Width="70" Height="70" CornerRadius="20"
+                                                    Background="{DynamicResource SurfaceAlt}"
+                                                    HorizontalAlignment="Center">
+                                                <PathIcon Data="{Binding Icon}" Width="33" Height="33"
+                                                          Foreground="{Binding IconBrush}"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding Name}" TextAlignment="Center" TextWrapping="Wrap"
+                                                       MaxLines="2" TextTrimming="CharacterEllipsis" FontSize="13.5"
+                                                       FontWeight="Medium"/>
+                                            <TextBlock Text="{Binding SizeOrKind}" Classes="caption" TextAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Вид «список»: ровная таблица со столбцами и сортировкой по заголовкам -->
+                            <Grid IsVisible="{Binding IsListMode}" RowDefinitions="Auto,Auto,*">
+                                <Grid Grid.Row="0" ColumnDefinitions="38,*,116,120,96" Margin="14,0,16,2">
+                                    <Button Grid.Column="1" Classes="colhdr" Content="{Binding NameHeader}"
+                                            Command="{Binding SortByCommand}" CommandParameter="name"/>
+                                    <TextBlock Grid.Column="2" Text="Тип" Classes="caption" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="3" Classes="colhdr" Content="{Binding DateHeader}"
+                                            Command="{Binding SortByCommand}" CommandParameter="date"/>
+                                    <Button Grid.Column="4" Classes="colhdr" Content="{Binding SizeHeader}"
+                                            HorizontalAlignment="Right" HorizontalContentAlignment="Right"
+                                            Command="{Binding SortByCommand}" CommandParameter="size"/>
+                                </Grid>
+                                <Border Grid.Row="1" Height="1" Background="{DynamicResource SurfaceBorder}" Margin="10,0,10,2"/>
+                                <ListBox x:Name="RowsList" Grid.Row="2" Classes="rows"
+                                         ItemsSource="{Binding Entries}" SelectionMode="Multiple"
+                                         SelectionChanged="OnRightSelectionChanged"
+                                         DoubleTapped="OnEntryDoubleTapped" Background="Transparent">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="38,*,116,120,96" MinHeight="38">
+                                                <Border Width="30" Height="30" CornerRadius="9"
+                                                        Background="{DynamicResource SurfaceAlt}" HorizontalAlignment="Left">
+                                                    <PathIcon Data="{Binding Icon}" Width="16" Height="16"
+                                                              Foreground="{Binding IconBrush}"/>
+                                                </Border>
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="4,0,10,0"
+                                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding CategoryText}" Classes="caption"
+                                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="3" Text="{Binding ModifiedText}" Classes="caption"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="4" Text="{Binding SizeText}" Classes="caption"
+                                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+
+                            <!-- Вид «столбцы» (Miller) -->
+                            <ScrollViewer x:Name="ColumnsScroll" IsVisible="{Binding IsColumnsMode}"
+                                          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <StackPanel Orientation="Horizontal">
+                                    <ItemsControl ItemsSource="{Binding Columns}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="214" BorderBrush="{DynamicResource SurfaceBorder}"
+                                                        BorderThickness="0,0,1,0" Padding="0,0,6,0" Margin="0,0,4,0">
+                                                    <ListBox Classes="millercol" ItemsSource="{Binding Items}"
+                                                             SelectedItem="{Binding Selected, Mode=TwoWay}"
+                                                             DoubleTapped="OnEntryDoubleTapped" Background="Transparent">
+                                                        <ListBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid ColumnDefinitions="Auto,*,Auto" Height="28">
+                                                                    <PathIcon Data="{Binding Icon}" Width="16" Height="16"
+                                                                              Foreground="{Binding IconBrush}"/>
+                                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="8,0"
+                                                                               TextTrimming="CharacterEllipsis" FontSize="13"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <PathIcon Grid.Column="2" Data="{StaticResource IconChevronRight}"
+                                                                              Width="9" Height="9" IsVisible="{Binding IsFolder}"
+                                                                              Foreground="{DynamicResource TextTertiary}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ListBox.ItemTemplate>
+                                                    </ListBox>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- Мини-карточка сведений о файле -->
+                                    <Border Width="238" Padding="18" VerticalAlignment="Top"
+                                            Margin="8,8,0,8" Classes="cardFlat"
+                                            IsVisible="{Binding PreviewFile, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Spacing="8">
+                                            <Border Width="64" Height="64" CornerRadius="18"
+                                                    Background="{DynamicResource SurfaceRaised}"
+                                                    HorizontalAlignment="Center">
+                                                <PathIcon Data="{Binding PreviewFile.Icon}" Width="32" Height="32"
+                                                          Foreground="{DynamicResource AccentBrush}"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding PreviewFile.Name}" TextWrapping="Wrap"
+                                                       TextAlignment="Center" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding PreviewFile.CategoryText}" Classes="caption"
+                                                       TextAlignment="Center"/>
+                                            <StackPanel Spacing="2" Margin="0,6,0,0">
+                                                <TextBlock Classes="caption">
+                                                    <Run Text="{x:Static loc:Strings.ColumnSize}"/><Run Text=": "/><Run Text="{Binding PreviewFile.SizeText}"/>
+                                                </TextBlock>
+                                                <TextBlock Classes="caption">
+                                                    <Run Text="{x:Static loc:Strings.ColumnModified}"/><Run Text=": "/><Run Text="{Binding PreviewFile.ModifiedText}"/>
+                                                </TextBlock>
+                                                <TextBlock Classes="caption">
+                                                    <Run Text="{x:Static loc:Strings.ColumnCreated}"/><Run Text=": "/><Run Text="{Binding PreviewFile.CreatedText}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <Button Classes="ghost" HorizontalAlignment="Center" Margin="0,6,0,0"
+                                                    Command="{Binding OpenPreviewCommand}"
+                                                    IsVisible="{Binding PreviewFile.AbsolutePath, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                <TextBlock Text="{x:Static loc:Strings.ExplorerOpenFile}"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Panel>
+
+                        <!-- Офлайн-индекс читается ограниченными страницами: интерфейс остаётся
+                             отзывчивым даже у носителя с миллионами сохранённых файлов. -->
+                        <Border Grid.Row="4" Padding="12,8" Background="{DynamicResource SurfaceAlt}"
+                                BorderBrush="{DynamicResource SurfaceBorder}" BorderThickness="0,1,0,0"
+                                IsVisible="{Binding IsOfflinePaged}">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Button Grid.Column="0" Classes="ghost" Content="Назад"
+                                        Command="{Binding PreviousIndexedPageCommand}"
+                                        IsEnabled="{Binding HasPreviousIndexedPage}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding IndexedPageText}" Classes="caption"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Button Grid.Column="2" Classes="ghost" Content="Дальше"
+                                        Command="{Binding NextIndexedPageCommand}"
+                                        IsEnabled="{Binding HasNextIndexedPage}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- ===== Подтверждение операции ===== -->
+        <Border IsVisible="{Binding ShowTransferConfirm}" Background="{DynamicResource OverlayDim}"
+                Focusable="True" KeyboardNavigation.TabNavigation="Cycle">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Border Classes="card" MaxWidth="580" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                    Margin="16" Padding="26">
+                <StackPanel Spacing="16">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Classes="iconTile" Width="48" Height="48">
+                            <PathIcon Data="{StaticResource IconMove}" Width="22" Height="22"
+                                      Foreground="{DynamicResource AccentBrush}"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="13,0,0,0" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Classes="h2" Text="{Binding TransferConfirmTitle}"/>
+                            <TextBlock Classes="caption" Text="Проверьте действие перед продолжением"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="{Binding TransferConfirmText}" TextWrapping="Wrap"/>
+                    <Border Classes="cardFlat" Padding="12" MaxHeight="170">
+                        <ScrollViewer>
+                            <TextBlock Text="{Binding TransferItemsPreview}" FontSize="13" Classes="muted"/>
+                        </ScrollViewer>
+                    </Border>
+                    <Border IsVisible="{Binding TransferIsMove}" Background="{DynamicResource WarningSoft}"
+                            CornerRadius="12" Padding="13">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <PathIcon Data="{StaticResource IconWarning}" Width="18" Height="18"
+                                      Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Top"/>
+                            <TextBlock Text="{x:Static loc:Strings.ExplorerMoveWarning}" TextWrapping="Wrap" MaxWidth="430"/>
+                        </StackPanel>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                        <Button x:Name="TransferCancelButton" Command="{Binding CancelTransferDialogCommand}"
+                                Content="{x:Static loc:Strings.Cancel}"/>
+                        <Button Classes="primary" Command="{Binding ConfirmTransferCommand}"
+                                Content="{Binding TransferConfirmAction}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ===== Прогресс операции (анимированное лого РЯДОМ с определённым прогрессом —
+             проценты и текущий файл важнее красоты, поэтому остаются) ===== -->
+        <Border IsVisible="{Binding IsTransferring}" Background="{DynamicResource OverlayDim}"
+                Focusable="True" KeyboardNavigation.TabNavigation="Cycle"
+                Opacity="{Binding IsTransferring, Converter={x:Static conv:Converters.ToOpacity}}">
+            <Border.Transitions>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                </Transitions>
+            </Border.Transitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Border Classes="card" MaxWidth="540" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                    Margin="16" Padding="26">
+                <Grid ColumnDefinitions="Auto,*">
+                    <controls:AnimatedLogo Grid.Column="0" Size="72" VerticalAlignment="Center" Margin="0,0,22,0"
+                                           IsVisible="{Binding IsTransferring}"/>
+                    <StackPanel Grid.Column="1" Spacing="14">
+                        <TextBlock Classes="h2" Text="{Binding TransferConfirmTitle}"/>
+                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding TransferPercent}"/>
+                        <TextBlock Text="{Binding TransferStatus}" Classes="muted" TextTrimming="CharacterEllipsis"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="TransferProgressCancelButton" Command="{Binding CancelTransferCommand}" IsEnabled="{Binding !CancelRequested}"
+                                    Content="{x:Static loc:Strings.Cancel}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            </ScrollViewer>
+        </Border>
+    </Panel>
+</UserControl>
